@@ -23,10 +23,7 @@ void	destroy_master(t_master *master)
 	{
 		unsigned int i = -1;
 		while (++i < master->points_used)
-		{
-			dprintf(STDERR_FILENO, "%u, %u\n", i, master->points_used);
 			free(master->points[i]);
-		}
 		free(master->points);
 	}
 	free(master);
@@ -50,14 +47,17 @@ t_master	*init_master(void)
 	master->temp_blocks = ff_new_block_list(NULL);
 	if (!(master->temp_blocks))
 		error_exit(master, "failed to alloc temp_blocks");
-	// master->mlx = mlx_init();
-	// if (!(master->mlx))
-	// 	error_exit(master, "failed to new mlx");
-	// master->window = mlx_new_window(master->mlx, 300, 200, "fir de fer");
-	// if (!(master->window))
-	// 	error_exit(master, "failed to new window");
+	master->mlx = mlx_init();
+	if (!(master->mlx))
+		error_exit(master, "failed to new mlx");
+	master->window_width = WIN_WIDTH;
+	master->window_height = WIN_HEIGHT;
+	master->window = mlx_new_window(master->mlx, master->window_width, master->window_height, "fir de fer");
+	if (!(master->window))
+		error_exit(master, "failed to new window");
 	master->points_cap = 32;
 	master->points = (t_mappoint **)malloc(master->points_cap * sizeof(t_mappoint *));
+	ff_set_tr_isometric(&master->transform);
 	return (master);
 }
 
@@ -70,9 +70,10 @@ int main(int argc, char **argv)
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	master = init_master();
 	ff_read_map(master, argv[1]);
-	// mlx_string_put(master->mlx, master->window, 100, 100, 0xffffff, "Hello World");
-	// mlx_loop(master->mlx);
+	mlx_string_put(master->mlx, master->window, 100, 100, 0xffffff, "Hello World");
+	ff_start_loop(master);
+	ff_print_map(master);
 	destroy_master(master);
-	system("leaks fdf");
+	// system("leaks fdf");
 	return (0);
 }

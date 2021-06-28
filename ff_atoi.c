@@ -1,5 +1,5 @@
 #include "fdf.h"
-#define DIGITS "01234567890ABCDEF"
+#define DIGITS "0123456789ABCDEF"
 
 int	ff_atoi_d(char *str, int *d)
 {
@@ -33,6 +33,8 @@ int	ff_atoi_hd(char *str, uint32_t *hd)
 	uint64_t	n;
 
 	n = 0;
+	if (str[0] == '0' && str[1] == 'x')
+		str += 2;
 	while (*str)
 	{
 		i = ft_stri(DIGITS, *(str++));

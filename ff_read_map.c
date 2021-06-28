@@ -40,12 +40,12 @@ t_mappoint	*make_point(char *element)
 	if (!tokens)
 		return (NULL);
 	token_size = ff_arraylen(tokens);
-	if (token_size < 1 || 2 < token_size)
+	if (1 <= token_size && token_size <= 2)
 	{
 		if (ff_atoi_d(tokens[0], &z) == -1)
 			return (NULL);
-		color = 0;
-		if (1 < token_size
+		color = 0xffffff;
+		if (2 <= token_size
 			&& ff_atoi_hd(tokens[1], &color) == -1)
 			return (NULL);
 	}
@@ -79,7 +79,7 @@ int	ff_convert_points(t_master *master, char *line, int status)
 	err = -1;
 	while (++j < row_size)
 	{
-		dprintf(STDERR_FILENO, "j: %zd |%s|\n", j, *(splitted + j));
+		// dprintf(STDERR_FILENO, "j: %zd |%s|\n", j, *(splitted + j));
 		err = -1;
 		point = make_point(*(splitted + j));
 		if (!point || push_point(master, point))
@@ -92,11 +92,24 @@ int	ff_convert_points(t_master *master, char *line, int status)
 	free(splitted);
 	if (err)
 		return (err);
-	dprintf(STDERR_FILENO, "status: %d, row_size: %zd\n", status, row_size);
+	// dprintf(STDERR_FILENO, "status: %d, row_size: %zd\n", status, row_size);
 	if (master->map_width > 0 && master->map_width != row_size)
 		return (-1);
 	master->map_width = row_size;
 	return (status);
+}
+
+void	ff_set_xy(t_master *master)
+{
+	unsigned int	i;
+
+	i = 0;
+	while (i < master->points_used)
+	{
+		master->points[i]->x = i % master->map_width;
+		master->points[i]->y = master->map_height - i / master->map_width - 1;
+		i += 1;
+	}
 }
 
 void	ff_read_map(t_master *master, const char *path)
@@ -118,7 +131,10 @@ void	ff_read_map(t_master *master, const char *path)
 		free(line);
 		if (status == -1)
 			error_exit(master, "failed to convert");
-		master->map_height += 1;
-		dprintf(STDERR_FILENO, "height: %u, status: %d\n", master->map_height, status);
 	}
+	if (master->points_used % master->map_width != 0)
+		dprintf(STDERR_FILENO, "points vs width not matched: (%u, %u)\n", master->points_used, master->map_width);
+	master->map_height = master->points_used / master->map_width;
+	ff_set_xy(master);
+	dprintf(STDERR_FILENO, "(%u, %u)\n", master->map_width, master->map_height);
 }
