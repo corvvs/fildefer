@@ -22,18 +22,21 @@ void	ff_apply_transform(t_master *master)
 
 static int32_t	mixed_color(t_mappoint *p1, t_mappoint *p2, double ratio)
 {
-	int		n;
-	int32_t	tc;
-	int32_t	mc;
+	int			n;
+	uint32_t	c1;
+	uint32_t	c2;
+	double		tc;
+	int32_t		mc;
 
 	n = 0;
 	mc = 0;
-	while (n <= 4)
+	while (n <= 16)
 	{
-
-		tc = (int)(((double)(p1->color >> n) - (double)(p2->color >> n)) * ratio + (double)(p2->color >> n) + 0.5);
-		mc = mc | (tc << n);
-		n += 2;
+		c1 = (p1->color >> n) & 0xff;
+		c2 = (p2->color >> n) & 0xff;
+		tc = ((double)c2 - (double)c1) * ratio + (double)c1 + 0.5;
+		mc += ((int)tc << n);
+		n += 8;
 	}
 	return (mc);
 }

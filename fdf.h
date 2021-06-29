@@ -11,8 +11,8 @@
 # include "mlx.h"
 # include "ff_alloc.h"
 #include <stdio.h>
-# define WIN_WIDTH 600
-# define WIN_HEIGHT 400
+# define WIN_WIDTH 800
+# define WIN_HEIGHT 600
 
 /*
  * (x,y,z): on map-system
@@ -71,6 +71,12 @@ typedef struct s_master
 	unsigned int	points_cap;
 	t_ff_block		*temp_blocks;
 	t_mappoint		**points;
+	double			vxmin;
+	double			vxmax;
+	double			vymin;
+	double			vymax;
+	double			vzmin;
+	double			vzmax;
 	t_transform		transform;
 	t_image			image;
 }	t_master;

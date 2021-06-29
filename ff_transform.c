@@ -94,22 +94,63 @@ void	ff_transform_point(t_transform *transform, t_mappoint *point)
 	p->vz = f->zx * p->x + f->zy * p->y + f->zz * p->z + f->zt;
 }
 
+void	ff_enclosing_transform(t_master *master)
+{
+	int			i;
+
+	master->vxmin = +1E300;
+	master->vymin = +1E300;
+	master->vzmin = +1E300;
+	master->vxmax = -1E300;
+	master->vymax = -1E300;
+	master->vzmax = -1E300;
+	i = -1;
+	while (++i < (int)master->points_used)
+	{
+		if (master->vxmin > master->points[i]->vx)
+			master->vxmin = master->points[i]->vx;
+		if (master->vxmax < master->points[i]->vx)
+			master->vxmax = master->points[i]->vx;
+		if (master->vymin > master->points[i]->vy)
+			master->vymin = master->points[i]->vy;
+		if (master->vymax < master->points[i]->vy)
+			master->vymax = master->points[i]->vy;
+		if (master->vzmin > master->points[i]->vz)
+			master->vzmin = master->points[i]->vz;
+		if (master->vzmax < master->points[i]->vz)
+			master->vzmax = master->points[i]->vz;
+	}
+}
+
 void	ff_default_transform(t_master *master)
 {
 	t_transform	t;
-	t_mappoint	*p1;
-	t_mappoint	*p2;
+	double 		mag;
 
-	p1 = master->points[0];
-	p2 = master->points[master->points_used - 1];
-	ff_set_tr_translate(&t, -(p1->vx + p2->vx) / 2, -(p1->vy + p2->vy) / 2, -(p1->vz + p2->vz) / 2);
+	// V -> M
+	ff_apply_transform(master);
+	// MBR(最小概説矩形)を求める
+	ff_enclosing_transform(master);
+	// MBRの中心を原点に合わせる
+	ff_set_tr_translate(&t, -(master->vxmin + master->vxmax) / 2, -(master->vymin + master->vymax) / 2, 0);
 	ff_tr_compose(&t, &(master->transform), &(master->transform));
-	ff_set_tr_scale(&t, 20, 20, 20);
+	// 画面の中心を原点に合わせる
+	ff_set_tr_translate(&t, -(double)master->window_width / 2, -(double)master->window_height / 2, 0);
+	if (master->points_used > 1)
+	{
+		// MBRが画面内にぴったりおさまるようズーム
+		mag = master->window_width / (master->vxmax - master->vxmin);
+		if (mag > master->window_height / (master->vymax - master->vymin))
+			mag = master->window_height / (master->vymax - master->vymin);
+		ff_set_tr_scale(&t, mag, mag, mag);
+		ff_tr_compose(&t, &(master->transform), &(master->transform));
+	}
+	// 画面の中心を戻す
+	ff_set_tr_translate(&t, (double)master->window_width / 2, (double)master->window_height / 2, 0);
 	ff_tr_compose(&t, &(master->transform), &(master->transform));
-	ff_set_tr_translate(&t, master->window_width / 2, master->window_height / 2, 300);
-	ff_tr_compose(&t, &(master->transform), &(master->transform));
+	// M系のY軸を反転
 	ff_set_tr_scale(&t, 1, -1, 1);
 	ff_tr_compose(&t, &(master->transform), &(master->transform));
-	ff_set_tr_translate(&t, 0, 1.5 * master->window_height, 0);
+	ff_set_tr_translate(&t, 0, 1 * master->window_height, 0);
 	ff_tr_compose(&t, &(master->transform), &(master->transform));
 }

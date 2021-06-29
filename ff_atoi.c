@@ -37,7 +37,7 @@ int	ff_atoi_hd(char *str, uint32_t *hd)
 		str += 2;
 	while (*str)
 	{
-		i = ft_stri(DIGITS, *(str++));
+		i = ft_stri(DIGITS, ft_toupper(*(str++)));
 		if (i < 0 || 16 <= i)
 			return (0);
 		n = n * 16 + i;
