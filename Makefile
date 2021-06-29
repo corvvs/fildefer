@@ -14,6 +14,7 @@ INCLUDES	:= -I$(MLIBX_MMS_DIR) -I$(LIBFT_DIR)
 GNL_SRCS	:= get_next_line.c get_next_line_utils.c
 SRCS		:=	ff_main.c ff_alloc.c ff_read_map.c ff_write.c\
 				ff_window.c ff_image.c ff_transform.c\
+				ff_hook_key.c\
 				ff_strs.c ff_atoi.c ff_split.c\
 				ff_debug.c\
 				$(GNL_SRCS)

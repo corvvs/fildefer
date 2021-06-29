@@ -20,6 +20,12 @@ void	ff_apply_transform(t_master *master)
 	}
 }
 
+void	ff_form_transform(t_master *master)
+{
+	ff_tr_compose(&master->tr_stage, &master->tr_rot, &master->transform);
+	ff_tr_compose(&master->tr_camera, &master->transform, &master->transform);
+}
+
 static int32_t	mixed_color(t_mappoint *p1, t_mappoint *p2, double ratio)
 {
 	int			n;
@@ -93,7 +99,7 @@ void	ff_paint_image(t_master *master)
 	unsigned int	xy;
 
 	ft_bzero(master->image.addr,
-		(master->window_height * master->window_width) * sizeof(uint32_t));
+		(master->window_height * master->image.size_line));
 	xy = 0;
 	while (xy < master->map_height * master->map_width)
 	{

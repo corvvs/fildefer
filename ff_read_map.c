@@ -106,8 +106,8 @@ void	ff_set_xy(t_master *master)
 	i = 0;
 	while (i < master->points_used)
 	{
-		master->points[i]->x = i % master->map_width;
-		master->points[i]->y = master->map_height - i / master->map_width - 1;
+		master->points[i]->x = i % master->map_width - (double)master->map_width / 2;
+		master->points[i]->y = master->map_height - i / master->map_width - 1 - (double)master->map_height / 2;
 		i += 1;
 	}
 }
