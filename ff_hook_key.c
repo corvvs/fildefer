@@ -23,5 +23,18 @@ int	hook_key_press(int key, t_master *master)
 		ff_set_tr_camera(master);
 		master->tr_changed = 1;
 	}
+	if (key == KEY_W || key == KEY_A || key == KEY_S || key == KEY_D)
+	{
+		if (key == KEY_W)
+			master->camera_pan_y -= 4.0;
+		if (key == KEY_S)
+			master->camera_pan_y += 4.0;
+		if (key == KEY_A)
+			master->camera_pan_x -= 4.0;
+		if (key == KEY_D)
+			master->camera_pan_x += 4.0;
+		ff_set_tr_camera(master);
+		master->tr_changed = 1;
+	}
 	return (0);
 }

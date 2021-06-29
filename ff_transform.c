@@ -158,10 +158,14 @@ void	ff_set_tr_camera(t_master *master)
 {
 	t_transform	t;
 
-	ff_set_tr_translate(&master->tr_camera, -(double)master->window_width / 2, -(double)master->window_height / 2, 0);
+	ff_set_tr_translate(&master->tr_camera,
+		-(double)master->window_width / 2,
+		-(double)master->window_height / 2, 0);
 	ff_set_tr_scale(&t, master->camera_zoom, master->camera_zoom, 1);
 	ff_tr_compose(&t, &master->tr_camera, &master->tr_camera);
-	ff_set_tr_translate(&t, +(double)master->window_width / 2, +(double)master->window_height / 2, 0);
+	ff_set_tr_translate(&t,
+		+(double)master->window_width / 2 + master->camera_pan_x,
+		+(double)master->window_height / 2 + master->camera_pan_y, 0);
 	ff_tr_compose(&t, &master->tr_camera, &master->tr_camera);
 	master->tr_changed = 1;
 }
