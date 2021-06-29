@@ -79,10 +79,6 @@ void	ff_tr_compose(t_transform *t, t_transform *s, t_transform *r)
 		t->tx * s->xz + t->ty * s->yz + t->tz * s->zz + t->tt * s->tz,
 		t->tx * s->xt + t->ty * s->yt + t->tz * s->zt + t->tt * s->tt
 		};
-	// printf("%+.2f %+.2f %+.2f %+.2f\n", r->xx, r->xy, r->xz, r->xt);
-	// printf("%+.2f %+.2f %+.2f %+.2f\n", r->yx, r->yy, r->yz, r->yt);
-	// printf("%+.2f %+.2f %+.2f %+.2f\n", r->zx, r->zy, r->zz, r->zt);
-	// printf("%+.2f %+.2f %+.2f %+.2f\n", r->tx, r->ty, r->tz, r->tt);
 }
 
 void	ff_transform_point(t_transform *transform, t_mappoint *point)
@@ -125,7 +121,7 @@ void	ff_enclosing_transform(t_master *master)
 	}
 }
 
-void	ff_default_transform(t_master *master)
+void	ff_set_tr_project(t_master *master)
 {
 	t_transform	t;
 	double 		mag;
@@ -135,7 +131,7 @@ void	ff_default_transform(t_master *master)
 	// MBR(最小外接矩形)を求める
 	ff_enclosing_transform(master);
 	// MBRの中心を原点に合わせる
-	ff_set_tr_translate(&master->tr_camera, -(master->vxmin + master->vxmax) / 2, -(master->vymin + master->vymax) / 2, 0);
+	ff_set_tr_translate(&master->tr_project, -(master->vxmin + master->vxmax) / 2, -(master->vymin + master->vymax) / 2, 0);
 	// 画面の中心を原点に合わせる
 	ff_set_tr_translate(&t, -(double)master->window_width / 2, -(double)master->window_height / 2, 0);
 	if (master->points_used > 1)
@@ -145,15 +141,27 @@ void	ff_default_transform(t_master *master)
 		if (mag > master->window_height / (master->vymax - master->vymin))
 			mag = master->window_height / (master->vymax - master->vymin);
 		ff_set_tr_scale(&t, mag, mag, mag);
-		ff_tr_compose(&t, &(master->tr_camera), &(master->tr_camera));
+		ff_tr_compose(&t, &(master->tr_project), &(master->tr_project));
 	}
 	// 画面の中心を戻す
 	ff_set_tr_translate(&t, (double)master->window_width / 2, (double)master->window_height / 2, 0);
-	ff_tr_compose(&t, &(master->tr_camera), &(master->tr_camera));
+	ff_tr_compose(&t, &(master->tr_project), &(master->tr_project));
 	// M系のY軸を反転
 	ff_set_tr_scale(&t, 1, -1, 1);
-	ff_tr_compose(&t, &(master->tr_camera), &(master->tr_camera));
+	ff_tr_compose(&t, &(master->tr_project), &(master->tr_project));
 	ff_set_tr_translate(&t, 0, 1 * master->window_height, 0);
-	ff_tr_compose(&t, &(master->tr_camera), &(master->tr_camera));
+	ff_tr_compose(&t, &(master->tr_project), &(master->tr_project));
+	master->tr_changed = 1;
+}
+
+void	ff_set_tr_camera(t_master *master)
+{
+	t_transform	t;
+
+	ff_set_tr_translate(&master->tr_camera, -(double)master->window_width / 2, -(double)master->window_height / 2, 0);
+	ff_set_tr_scale(&t, master->camera_zoom, master->camera_zoom, 1);
+	ff_tr_compose(&t, &master->tr_camera, &master->tr_camera);
+	ff_set_tr_translate(&t, +(double)master->window_width / 2, +(double)master->window_height / 2, 0);
+	ff_tr_compose(&t, &master->tr_camera, &master->tr_camera);
 	master->tr_changed = 1;
 }

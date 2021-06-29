@@ -85,9 +85,13 @@ typedef struct s_master
 	double			vzmax;
 	t_transform		tr_stage;
 	t_transform		tr_rot;
+	t_transform		tr_project;
 	t_transform		tr_camera;
 	t_transform		transform;
 	double			phi;
+	double			camera_zoom;
+	double			camera_pan_x;
+	double			camera_pan_y;
 	t_image			image;
 	int				painting;
 	int				tr_changed;
@@ -101,7 +105,8 @@ char	**ff_destructive_split(char *str, char c);
 void	ff_read_map(t_master *master, const char *path);
 void	ff_start_loop(t_master *master);
 
-void	ff_default_transform(t_master *master);
+void	ff_set_tr_project(t_master *master);
+void	ff_set_tr_camera(t_master *master);
 void	ff_new_image(t_master *master);
 void    ff_paint_image(t_master *master);
 void	ff_apply_transform(t_master *master);

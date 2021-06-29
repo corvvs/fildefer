@@ -17,7 +17,7 @@ int	ff_main_loop(t_master *master)
 void	ff_start_loop(t_master *master)
 {
 	ff_new_image(master);
-	ff_default_transform(master);
+	ff_set_tr_project(master);
 	mlx_loop_hook(master->mlx, &ff_main_loop, master);
 	mlx_hook(master->window, EVENT_KEY_PRESS,
 		MASK_KEY_PRESS, &hook_key_press, master);

@@ -23,7 +23,13 @@ void	ff_apply_transform(t_master *master)
 void	ff_form_transform(t_master *master)
 {
 	ff_tr_compose(&master->tr_stage, &master->tr_rot, &master->transform);
+	ff_tr_compose(&master->tr_project, &master->transform, &master->transform);
 	ff_tr_compose(&master->tr_camera, &master->transform, &master->transform);
+	// t_transform *r = &master->tr_camera;
+	// printf("%+.2f %+.2f %+.2f %+.2f\n", r->xx, r->xy, r->xz, r->xt);
+	// printf("%+.2f %+.2f %+.2f %+.2f\n", r->yx, r->yy, r->yz, r->yt);
+	// printf("%+.2f %+.2f %+.2f %+.2f\n", r->zx, r->zy, r->zz, r->zt);
+	// printf("%+.2f %+.2f %+.2f %+.2f\n", r->tx, r->ty, r->tz, r->tt);
 }
 
 static int32_t	mixed_color(t_mappoint *p1, t_mappoint *p2, double ratio)

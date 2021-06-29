@@ -66,6 +66,8 @@ t_master	*init_master(void)
 	ff_set_tr_isometric(&master->transform);
 	ff_set_tr_isometric(&master->tr_stage);
 	ff_set_tr_rotate(&master->tr_rot, master->phi);
+	ff_set_tr_rotate(&master->tr_camera, 0);
+	master->camera_zoom = 1;
 	return (master);
 }
 
