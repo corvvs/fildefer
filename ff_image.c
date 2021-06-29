@@ -55,11 +55,13 @@ static int32_t	mixed_color(t_mappoint *p1, t_mappoint *p2, double ratio)
 
 static void ff_connect_points(t_master *master, int i, int j)
 {
-	t_mappoint  *p1;
-	t_mappoint  *p2;
-	int ti;
-	int ti2;
-	int ui;
+	t_mappoint	*p1;
+	t_mappoint	*p2;
+	int			ti;
+	int			ti2;
+	int			ui;
+	int			k;
+	double		z;
 
 	p1 = master->points[i];
 	p2 = master->points[j];
@@ -76,9 +78,14 @@ static void ff_connect_points(t_master *master, int i, int j)
 		while (ti <= ti2)
 		{
 			ui = (int)((p2->vy - p1->vy) / (p2->vx - p1->vx + 1e-10) * (ti - p1->vx) + p1->vy + 0.5);
+			z = (p2->vz - p1->vz) / (p2->vx - p1->vx + 1e-10) * (ti - p1->vx) + p1->vz;
+			k = ui * master->image.size_line / sizeof(uint32_t) + ti;
 			// printf("(%d, %d)\n", ti, ui);
-			if (0 <= ti && ti < (int)master->window_width && 0 <= ui && ui < (int)master->window_height)
-				master->image.addr[ui * master->image.size_line / sizeof(uint32_t) + ti] = mixed_color(p1, p2, (ti - p1->vx) / (p2->vx - p1->vx + 1e-10));
+			if (0 <= ti && ti < (int)master->window_width && 0 <= ui && ui < (int)master->window_height && master->z_buffer[k] < z)
+			{
+				master->z_buffer[k] = z;
+				master->image.addr[k] = mixed_color(p1, p2, (ti - p1->vx) / (p2->vx - p1->vx + 1e-10));
+			}
 			ti += 1;
 		}
 	} else {
@@ -92,11 +99,28 @@ static void ff_connect_points(t_master *master, int i, int j)
 		while (ti <= ti2)
 		{
 			ui = (int)((p2->vx - p1->vx) / (p2->vy - p1->vy) * (ti - p1->vy) + p1->vx + 0.5);
+			z = (p2->vz - p1->vz) / (p2->vy - p1->vy + 1e-10) * (ti - p1->vy) + p1->vz;
+			k = ti * master->image.size_line / sizeof(uint32_t) + ui;
 			// printf("(%d, %d)\n", ui, ti);
-			if (0 <= ui && ui < (int)master->window_width && 0 <= ti && ti < (int)master->window_height)
-				master->image.addr[ti * master->image.size_line / sizeof(uint32_t) + ui] = mixed_color(p1, p2, (ti - p1->vy) / (p2->vy - p1->vy + 1e-10));
+			if (0 <= ui && ui < (int)master->window_width && 0 <= ti && ti < (int)master->window_height && master->z_buffer[k] < z)
+			{
+				master->z_buffer[k] = z;
+				master->image.addr[k] = mixed_color(p1, p2, (ti - p1->vy) / (p2->vy - p1->vy + 1e-10));
+			}
 			ti += 1;
 		}
+	}
+}
+
+void	ff_fill_zbuffer(t_master *master)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < master->image_size)
+	{
+		master->z_buffer[i] = -1e300;
+		i += 1;
 	}
 }
 
@@ -106,6 +130,7 @@ void	ff_paint_image(t_master *master)
 
 	ft_bzero(master->image.addr,
 		(master->window_height * master->image.size_line));
+	ff_fill_zbuffer(master);
 	xy = 0;
 	while (xy < master->map_height * master->map_width)
 	{
@@ -135,5 +160,9 @@ void	ff_new_image(t_master *master)
 		);
 	if (!(m->image.addr))
 		error_exit(m, "failed to mlx_get_data_addr");
+	m->image_size = (m->window_height * m->image.size_line) / sizeof(uint32_t);
+	m->z_buffer = (double *)malloc(m->image_size * sizeof(double));
+	if (!(m->z_buffer))
+		error_exit(m, "failed to alloc z_buffer");
 	printf("bpp: %d, endian: %d, size_line: %d\n", m->image.bits_per_pixel, m->image.endian, m->image.size_line);
 }

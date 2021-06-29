@@ -93,6 +93,8 @@ typedef struct s_master
 	double			camera_pan_x;
 	double			camera_pan_y;
 	t_image			image;
+	size_t			image_size;
+	double			*z_buffer;
 	int				painting;
 	int				tr_changed;
 }	t_master;

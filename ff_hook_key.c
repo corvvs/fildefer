@@ -13,6 +13,7 @@ int	hook_key_press(int key, t_master *master)
 			master->phi -= M_PI / 64;
 		ff_set_tr_rotate(&master->tr_rot, master->phi);
 		master->tr_changed = 1;
+		return (0);
 	}
 	if (key == KEY_UP || key == KEY_DOWN)
 	{
@@ -22,6 +23,7 @@ int	hook_key_press(int key, t_master *master)
 			master->camera_zoom *= 0.9;
 		ff_set_tr_camera(master);
 		master->tr_changed = 1;
+		return (0);
 	}
 	if (key == KEY_W || key == KEY_A || key == KEY_S || key == KEY_D)
 	{
@@ -35,6 +37,7 @@ int	hook_key_press(int key, t_master *master)
 			master->camera_pan_x += 4.0;
 		ff_set_tr_camera(master);
 		master->tr_changed = 1;
+		return (0);
 	}
 	return (0);
 }
