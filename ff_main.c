@@ -65,9 +65,6 @@ t_master	*init_master(void)
 	master->points = (t_mappoint **)malloc(master->points_cap * sizeof(t_mappoint *));
 	ff_set_tr_isometric(&master->transform);
 	ff_set_tr_isometric(&master->tr_stage);
-	ff_set_tr_rotate(&master->tr_rot, master->phi);
-	ff_set_tr_rotate(&master->tr_camera, 0);
-	master->camera_zoom = 1;
 	return (master);
 }
 

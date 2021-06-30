@@ -2,7 +2,6 @@
 
 int	ff_main_loop(t_master *master)
 {
-	(void)master;
 	if (master->painting || !master->tr_changed)
 		return (0);
 	master->painting = 1;
@@ -21,5 +20,12 @@ void	ff_start_loop(t_master *master)
 	mlx_loop_hook(master->mlx, &ff_main_loop, master);
 	mlx_hook(master->window, EVENT_KEY_PRESS,
 		MASK_KEY_PRESS, &hook_key_press, master);
+	mlx_hook(master->window, EVENT_MOUSE_PRESS,
+		MASK_MOUSE_PRESS, &hook_mouse_down, master);
+	mlx_hook(master->window, EVENT_MOUSE_RELEASE,
+		MASK_MOUSE_RELEASE, &hook_mouse_up, master);
+	mlx_hook(master->window, EVENT_MOTION,
+		MASK_MOTION, &hook_motion, master);
+	
 	mlx_loop(master->mlx);
 }

@@ -17,8 +17,20 @@
 # define WIN_HEIGHT 600
 
 # define EVENT_KEY_PRESS 2
-# define MASK_KEY_PRESS 1
+# define EVENT_MOUSE_PRESS 4
+# define EVENT_MOUSE_RELEASE 5
+# define EVENT_MOTION 6
+# define MASK_KEY_PRESS 1L
+# define MASK_MOUSE_PRESS 4L
+# define MASK_MOUSE_RELEASE 8L
+# define MASK_MOTION 64L
 
+typedef struct	s_vector
+{
+	double		x;
+	double		y;
+	double		z;
+}	t_vector;
 
 /*
  * (x,y,z): on map-system
@@ -89,14 +101,14 @@ typedef struct s_master
 	t_transform		tr_camera;
 	t_transform		transform;
 	double			phi;
-	double			camera_zoom;
-	double			camera_pan_x;
-	double			camera_pan_y;
 	t_image			image;
 	size_t			image_size;
 	double			*z_buffer;
 	int				painting;
 	int				tr_changed;
+	int				dragging;
+	int				do_x;
+	int				do_y;
 }	t_master;
 
 void	error_exit(t_master *master, char *message);
@@ -108,7 +120,8 @@ void	ff_read_map(t_master *master, const char *path);
 void	ff_start_loop(t_master *master);
 
 void	ff_set_tr_project(t_master *master);
-void	ff_set_tr_camera(t_master *master);
+void	ff_pan_tr_camera(t_master *master, double dx, double dy);
+void	ff_zoom_tr_camera(t_master *master, double cx, double cy, double m);
 void	ff_new_image(t_master *master);
 void    ff_paint_image(t_master *master);
 void	ff_apply_transform(t_master *master);
@@ -119,6 +132,9 @@ void	ff_tr_compose(t_transform *t, t_transform *s, t_transform *r);
 void	ff_transform_point(t_transform *transform, t_mappoint *point);
 
 int		hook_key_press(int key, t_master *master);
+int		hook_mouse_down(int button, int x, int y, t_master *master);
+int		hook_mouse_up(int button, int x, int y, t_master *m);
+int		hook_motion(int x, int y, t_master *m);
 void	ff_print_map(t_master *master);
 
 #endif

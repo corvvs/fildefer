@@ -53,18 +53,72 @@ static int32_t	mixed_color(t_mappoint *p1, t_mappoint *p2, double ratio)
 	return (mc);
 }
 
+int	ff_pixel_is_clipped(t_master *master, int x, int y)
+{
+	return (x < 0 || (int)master->window_width <= x
+		|| y < 0 || (int)master->window_height <= y);
+}
+
+int	ff_point_is_clipped(t_master *master, t_mappoint *p)
+{
+	return (p->vx < 0 || master->window_width <= p->vx
+		|| p->vy < 0 || master->window_height <= p->vy);
+}
+
+int	ff_segment_is_crossing(t_mappoint *p1, t_mappoint *p2, t_vector *q1, t_vector *q2)
+{
+	double	denom;
+	double	s;
+
+	denom = (p2->vx - p1->vx) * (q2->y - q1->y) - (p2->vy - p1->vy) * (q2->x - q1->x);
+	if (denom == 0)
+		return (0);
+	s = (-(q2->y - q1->y) * (q1->x - p1->vx) + (q2->x - q1->x) * (q1->y - p1->vy)) / denom;
+	if (s < 0 || 1 < s)
+		return (0);
+	s = (+(p2->vy - p1->vy) * (q1->x - p1->vx) - (p2->vx - p1->vx) * (q1->y - p1->vy)) / denom;
+	if (s < 0 || 1 < s)
+		return (0);
+	return (1);
+}
+
+int	ff_segment_is_clipped(t_master *master, t_mappoint *p1, t_mappoint *p2)
+{
+	t_vector	q1;
+	t_vector	q2;
+
+	if (!ff_point_is_clipped(master, p1) || !ff_point_is_clipped(master, p2))
+		return (0);
+	q1 = (t_vector){ 0, 0, 0 };
+	q2 = (t_vector){ master->window_width, 0, 0 };
+	if (ff_segment_is_crossing(p1, p2, &q1, &q2))
+		return (1);
+	q1 = (t_vector){ master->window_width, master->window_height, 0 };
+	if (ff_segment_is_crossing(p1, p2, &q2, &q1))
+		return (1);
+	q2 = (t_vector){ 0, master->window_height, 0 };
+	if (ff_segment_is_crossing(p1, p2, &q1, &q2))
+		return (1);
+	q1 = (t_vector){ 0, 0, 0 };
+	if (ff_segment_is_crossing(p1, p2, &q2, &q1))
+		return (1);
+	return (0);
+}
+
 static void ff_connect_points(t_master *master, int i, int j)
 {
 	t_mappoint	*p1;
 	t_mappoint	*p2;
-	int			ti;
-	int			ti2;
-	int			ui;
+	int			xi;
+	int			capi;
+	int			yi;
 	int			k;
 	double		z;
 
 	p1 = master->points[i];
 	p2 = master->points[j];
+	if (ff_segment_is_clipped(master, p1, p2))
+		return ;
 	// printf("(%d-%d) | (%.2f, %.2f, %.2f) -> (%.2f, %.2f, %.2f)\n", i, j, p1->vx, p1->vy, p1->vz, p2->vx, p2->vy, p2->vz);
 	if (fabs(p1->vx - p2->vx) >= fabs(p1->vy - p2->vy))
 	{
@@ -73,20 +127,22 @@ static void ff_connect_points(t_master *master, int i, int j)
 			p1 = master->points[j];
 			p2 = master->points[i];
 		}
-		ti = (int)(p1->vx + 0.5);
-		ti2 = (int)(p2->vx + 0.5);
-		while (ti <= ti2)
+		xi = (int)(p1->vx + 0.5);
+		capi = (int)(p2->vx + 0.5);
+		double m = (p2->vy - p1->vy) / (p2->vx - p1->vx + 1e-10);
+		while (xi <= capi)
 		{
-			ui = (int)((p2->vy - p1->vy) / (p2->vx - p1->vx + 1e-10) * (ti - p1->vx) + p1->vy + 0.5);
-			z = (p2->vz - p1->vz) / (p2->vx - p1->vx + 1e-10) * (ti - p1->vx) + p1->vz;
-			k = ui * master->image.size_line / sizeof(uint32_t) + ti;
-			// printf("(%d, %d)\n", ti, ui);
-			if (0 <= ti && ti < (int)master->window_width && 0 <= ui && ui < (int)master->window_height && master->z_buffer[k] < z)
+			yi = (int)(m * (xi - p1->vx) + p1->vy + 0.5);
+			z = (p2->vz - p1->vz) / (p2->vx - p1->vx + 1e-10) * (xi - p1->vx) + p1->vz;
+			k = yi * master->image.size_line / sizeof(uint32_t) + xi;
+			// printf("(%d, %d)\n", xi, yi);
+			
+			if (!ff_pixel_is_clipped(master, xi, yi) && master->z_buffer[k] < z)
 			{
 				master->z_buffer[k] = z;
-				master->image.addr[k] = mixed_color(p1, p2, (ti - p1->vx) / (p2->vx - p1->vx + 1e-10));
+				master->image.addr[k] = mixed_color(p1, p2, (xi - p1->vx) / (p2->vx - p1->vx + 1e-10));
 			}
-			ti += 1;
+			xi += 1;
 		}
 	} else {
 		if (p1->vy > p2->vy)
@@ -94,20 +150,21 @@ static void ff_connect_points(t_master *master, int i, int j)
 			p1 = master->points[j];
 			p2 = master->points[i];
 		}
-		ti = (int)(p1->vy + 0.5);
-		ti2 = (int)(p2->vy + 0.5);
-		while (ti <= ti2)
+		yi = (int)(p1->vy + 0.5);
+		capi = (int)(p2->vy + 0.5);
+		double m = (p2->vx - p1->vx) / (p2->vy - p1->vy + 1e-10);
+		while (yi <= capi)
 		{
-			ui = (int)((p2->vx - p1->vx) / (p2->vy - p1->vy) * (ti - p1->vy) + p1->vx + 0.5);
-			z = (p2->vz - p1->vz) / (p2->vy - p1->vy + 1e-10) * (ti - p1->vy) + p1->vz;
-			k = ti * master->image.size_line / sizeof(uint32_t) + ui;
-			// printf("(%d, %d)\n", ui, ti);
-			if (0 <= ui && ui < (int)master->window_width && 0 <= ti && ti < (int)master->window_height && master->z_buffer[k] < z)
+			xi = (int)(m * (yi - p1->vy) + p1->vx + 0.5);
+			z = (p2->vz - p1->vz) / (p2->vy - p1->vy + 1e-10) * (yi - p1->vy) + p1->vz;
+			k = yi * master->image.size_line / sizeof(uint32_t) + xi;
+			// printf("(%d, %d)\n", xi, yi);
+			if (!ff_pixel_is_clipped(master, xi, yi) && master->z_buffer[k] < z)
 			{
 				master->z_buffer[k] = z;
-				master->image.addr[k] = mixed_color(p1, p2, (ti - p1->vy) / (p2->vy - p1->vy + 1e-10));
+				master->image.addr[k] = mixed_color(p1, p2, (yi - p1->vy) / (p2->vy - p1->vy + 1e-10));
 			}
-			ti += 1;
+			yi += 1;
 		}
 	}
 }

@@ -1,42 +1,47 @@
 #include "fdf.h"
 
-int	hook_key_press(int key, t_master *master)
+int	hook_key_press(int key, t_master *m)
 {
 	printf("key = %d\n", key);
 	if (key == KEY_ESC)
-		normal_exit(master);
+		normal_exit(m);
+	if (key == KEY_0)
+	{
+		m->phi = 0;
+		ff_set_tr_rotate(&m->tr_camera, 0);
+		ff_set_tr_project(m);
+		return (0);
+	}
 	if (key == KEY_LEFT || key == KEY_RIGHT)
 	{
 		if (key == KEY_LEFT)
-			master->phi += M_PI / 64;
+			m->phi += M_PI / 64;
 		else
-			master->phi -= M_PI / 64;
-		ff_set_tr_rotate(&master->tr_rot, master->phi);
-		master->tr_changed = 1;
+			m->phi -= M_PI / 64;
+		ff_set_tr_rotate(&m->tr_rot, m->phi);
+		m->tr_changed = 1;
 		return (0);
 	}
 	if (key == KEY_UP || key == KEY_DOWN)
 	{
 		if (key == KEY_UP)
-			master->camera_zoom *= 1.1;
+			ff_zoom_tr_camera(m, m->window_width * 0.5, m->window_height * 0.5, 1.1);
 		else
-			master->camera_zoom *= 0.9;
-		ff_set_tr_camera(master);
-		master->tr_changed = 1;
+			ff_zoom_tr_camera(m, m->window_width * 0.5, m->window_height * 0.5, 0.9);
+		m->tr_changed = 1;
 		return (0);
 	}
 	if (key == KEY_W || key == KEY_A || key == KEY_S || key == KEY_D)
 	{
 		if (key == KEY_W)
-			master->camera_pan_y -= 4.0;
+			ff_pan_tr_camera(m, 0, -4.0);
 		if (key == KEY_S)
-			master->camera_pan_y += 4.0;
+			ff_pan_tr_camera(m, 0, +4.0);
 		if (key == KEY_A)
-			master->camera_pan_x -= 4.0;
+			ff_pan_tr_camera(m, -4.0, 0);
 		if (key == KEY_D)
-			master->camera_pan_x += 4.0;
-		ff_set_tr_camera(master);
-		master->tr_changed = 1;
+			ff_pan_tr_camera(m, +4.0, 0);
+		m->tr_changed = 1;
 		return (0);
 	}
 	return (0);
