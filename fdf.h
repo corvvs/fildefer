@@ -95,12 +95,13 @@ typedef struct s_master
 	double			vymax;
 	double			vzmin;
 	double			vzmax;
-	t_transform		tr_stage;
-	t_transform		tr_rot;
 	t_transform		tr_project;
+	t_transform		tr_mapmod;
+	t_transform		tr_framing;
 	t_transform		tr_camera;
 	t_transform		transform;
 	double			phi;
+	double			map_zscale;
 	t_image			image;
 	size_t			image_size;
 	double			*z_buffer;
@@ -119,11 +120,12 @@ char	**ff_destructive_split(char *str, char c);
 void	ff_read_map(t_master *master, const char *path);
 void	ff_start_loop(t_master *master);
 
-void	ff_set_tr_project(t_master *master);
+void	ff_setup_tr_mapmod(t_master *master);
+void	ff_setup_tr_project(t_master *master);
 void	ff_pan_tr_camera(t_master *master, double dx, double dy);
 void	ff_zoom_tr_camera(t_master *master, double cx, double cy, double m);
 void	ff_new_image(t_master *master);
-void    ff_paint_image(t_master *master);
+void    ff_draw_image(t_master *master);
 void	ff_apply_transform(t_master *master);
 void	ff_set_tr_isometric(t_transform *t);
 void	ff_set_tr_rotate(t_transform *t, double phi);
@@ -133,8 +135,8 @@ void	ff_transform_point(t_transform *transform, t_mappoint *point);
 
 int		hook_key_press(int key, t_master *master);
 int		hook_mouse_down(int button, int x, int y, t_master *master);
-int		hook_mouse_up(int button, int x, int y, t_master *m);
-int		hook_motion(int x, int y, t_master *m);
+int		hook_mouse_up(int button, int x, int y, t_master *master);
+int		hook_motion(int x, int y, t_master *master);
 void	ff_print_map(t_master *master);
 
 #endif

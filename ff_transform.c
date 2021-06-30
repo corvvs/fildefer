@@ -78,7 +78,7 @@ void	ff_tr_compose(t_transform *t, t_transform *s, t_transform *r)
 		t->tx * s->xy + t->ty * s->yy + t->tz * s->zy + t->tt * s->ty,
 		t->tx * s->xz + t->ty * s->yz + t->tz * s->zz + t->tt * s->tz,
 		t->tx * s->xt + t->ty * s->yt + t->tz * s->zt + t->tt * s->tt
-		};
+	};
 }
 
 void	ff_transform_point(t_transform *transform, t_mappoint *point)
@@ -93,7 +93,8 @@ void	ff_transform_point(t_transform *transform, t_mappoint *point)
 	p->vz = f->zx * p->x + f->zy * p->y + f->zz * p->z + f->zt;
 }
 
-void	ff_enclosing_transform(t_master *master)
+// calculate bounding-box
+void	ff_derive_bbox(t_master *master)
 {
 	int			i;
 
@@ -121,33 +122,42 @@ void	ff_enclosing_transform(t_master *master)
 	}
 }
 
-void	ff_set_tr_project(t_master *master)
+void	ff_setup_tr_mapmod(t_master *m)
 {
 	t_transform	t;
-	double 		mag;
 
-	ff_set_tr_rotate(&master->tr_rot, master->phi);
-	ff_tr_compose(&master->tr_stage, &master->tr_rot, &master->transform);
-	ff_apply_transform(master);
-	ff_enclosing_transform(master);
-	ff_set_tr_translate(&master->tr_project, -(master->vxmin + master->vxmax) / 2, -(master->vymin + master->vymax) / 2, 0);
-	ff_set_tr_translate(&t, -(double)master->window_width / 2, -(double)master->window_height / 2, 0);
-	if (master->vxmax != master->vxmin && master->vymax != master->vymin)
+	ff_set_tr_rotate(&m->tr_mapmod, m->phi);
+	ff_set_tr_scale(&t, 1, 1, m->map_zscale);
+	ff_tr_compose(&t, &m->tr_mapmod, &m->tr_mapmod);
+}
+
+void	ff_setup_tr_project(t_master *m)
+{
+	t_transform	t;
+	double		mag;
+
+	ff_setup_tr_mapmod(m);
+	ff_tr_compose(&m->tr_project, &m->tr_mapmod, &m->transform);
+	ff_apply_transform(m);
+	ff_derive_bbox(m);
+	ff_set_tr_translate(&m->tr_framing,
+		-(m->vxmin + m->vxmax) / 2, -(m->vymin + m->vymax) / 2, 0);
+	ff_set_tr_translate(&t, -m->window_width / 2., -m->window_height / 2., 0);
+	if (m->vxmax != m->vxmin && m->vymax != m->vymin)
 	{
-		mag = master->window_width / (master->vxmax - master->vxmin);
-		if (mag > master->window_height / (master->vymax - master->vymin))
-			mag = master->window_height / (master->vymax - master->vymin);
+		mag = m->window_width / (m->vxmax - m->vxmin);
+		if (mag > m->window_height / (m->vymax - m->vymin))
+			mag = m->window_height / (m->vymax - m->vymin);
 		ff_set_tr_scale(&t, mag, mag, mag);
-		ff_tr_compose(&t, &(master->tr_project), &(master->tr_project));
+		ff_tr_compose(&t, &(m->tr_framing), &(m->tr_framing));
 	}
-	ff_set_tr_translate(&t, (double)master->window_width / 2, (double)master->window_height / 2, 0);
-	ff_tr_compose(&t, &(master->tr_project), &(master->tr_project));
+	ff_set_tr_translate(&t, m->window_width / 2., m->window_height / 2., 0);
+	ff_tr_compose(&t, &(m->tr_framing), &(m->tr_framing));
 	ff_set_tr_scale(&t, 1, -1, 1);
-	ff_tr_compose(&t, &(master->tr_project), &(master->tr_project));
-	ff_set_tr_translate(&t, 0, 1 * master->window_height, 0);
-	ff_tr_compose(&t, &(master->tr_project), &(master->tr_project));
-	ff_set_tr_rotate(&master->tr_camera, 0);
-	master->tr_changed = 1;
+	ff_tr_compose(&t, &(m->tr_framing), &(m->tr_framing));
+	ff_set_tr_translate(&t, 0, 1 * m->window_height, 0);
+	ff_tr_compose(&t, &(m->tr_framing), &(m->tr_framing));
+	ff_set_tr_rotate(&m->tr_camera, 0);
 }
 
 void	ff_pan_tr_camera(t_master *master, double dx, double dy)

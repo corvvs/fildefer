@@ -22,8 +22,8 @@ void	ff_apply_transform(t_master *master)
 
 void	ff_form_transform(t_master *master)
 {
-	ff_tr_compose(&master->tr_stage, &master->tr_rot, &master->transform);
-	ff_tr_compose(&master->tr_project, &master->transform, &master->transform);
+	ff_tr_compose(&master->tr_project, &master->tr_mapmod, &master->transform);
+	ff_tr_compose(&master->tr_framing, &master->transform, &master->transform);
 	ff_tr_compose(&master->tr_camera, &master->transform, &master->transform);
 	// t_transform *r = &master->tr_camera;
 	// printf("%+.2f %+.2f %+.2f %+.2f\n", r->xx, r->xy, r->xz, r->xt);
@@ -32,7 +32,8 @@ void	ff_form_transform(t_master *master)
 	// printf("%+.2f %+.2f %+.2f %+.2f\n", r->tx, r->ty, r->tz, r->tt);
 }
 
-static int32_t	mixed_color(t_mappoint *p1, t_mappoint *p2, double ratio)
+// derive a color for the point between 2 given points.
+static int32_t	mix_color(t_mappoint *p1, t_mappoint *p2, double ratio)
 {
 	int			n;
 	uint32_t	c1;
@@ -137,7 +138,7 @@ static void ff_connect_points(t_master *master, int i, int j)
 			if (!ff_pixel_is_clipped(master, xi, yi) && master->z_buffer[k] < z)
 			{
 				master->z_buffer[k] = z;
-				master->image.addr[k] = mixed_color(p1, p2, (xi - p1->vx) / (p2->vx - p1->vx + 1e-10));
+				master->image.addr[k] = mix_color(p1, p2, (xi - p1->vx) / (p2->vx - p1->vx + 1e-10));
 			}
 			xi += 1;
 		}
@@ -158,7 +159,7 @@ static void ff_connect_points(t_master *master, int i, int j)
 			if (!ff_pixel_is_clipped(master, xi, yi) && master->z_buffer[k] < z)
 			{
 				master->z_buffer[k] = z;
-				master->image.addr[k] = mixed_color(p1, p2, (yi - p1->vy) / (p2->vy - p1->vy + 1e-10));
+				master->image.addr[k] = mix_color(p1, p2, (yi - p1->vy) / (p2->vy - p1->vy + 1e-10));
 			}
 			yi += 1;
 		}
@@ -177,7 +178,7 @@ void	ff_fill_zbuffer(t_master *master)
 	}
 }
 
-void	ff_paint_image(t_master *master)
+void	ff_draw_image(t_master *master)
 {
 	unsigned int	xy;
 

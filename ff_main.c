@@ -63,8 +63,11 @@ t_master	*init_master(void)
 		error_exit(master, "failed to new window");
 	master->points_cap = 32;
 	master->points = (t_mappoint **)malloc(master->points_cap * sizeof(t_mappoint *));
+	if (!(master->points))
+		error_exit(master, "failed to alloc points");
+	master->map_zscale = 1;
 	ff_set_tr_isometric(&master->transform);
-	ff_set_tr_isometric(&master->tr_stage);
+	ff_set_tr_isometric(&master->tr_project);
 	return (master);
 }
 
@@ -77,7 +80,6 @@ int main(int argc, char **argv)
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	master = init_master();
 	ff_read_map(master, argv[1]);
-	// mlx_string_put(master->mlx, master->window, 100, 100, 0xffffff, "Hello World");
 	ff_start_loop(master);
 	ff_print_map(master);
 	destroy_master(master);

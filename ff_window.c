@@ -7,7 +7,7 @@ int	ff_main_loop(t_master *master)
 	master->painting = 1;
 	ff_form_transform(master);
 	ff_apply_transform(master);
-	ff_paint_image(master);
+	ff_draw_image(master);
 	master->painting = 0;
 	master->tr_changed = 0;
 	return (0);
@@ -16,7 +16,8 @@ int	ff_main_loop(t_master *master)
 void	ff_start_loop(t_master *master)
 {
 	ff_new_image(master);
-	ff_set_tr_project(master);
+	ff_setup_tr_project(master);
+	master->tr_changed = 1;
 	mlx_loop_hook(master->mlx, &ff_main_loop, master);
 	mlx_hook(master->window, EVENT_KEY_PRESS,
 		MASK_KEY_PRESS, &hook_key_press, master);
