@@ -59,7 +59,7 @@ int	ff_pixel_is_clipped(t_master *master, int x, int y)
 		|| y < 0 || (int)master->window_height <= y);
 }
 
-int	ff_point_is_clipped(t_master *master, t_mappoint *p)
+int	ff_point_is_out(t_master *master, t_mappoint *p)
 {
 	return (p->vx < 0 || master->window_width <= p->vx
 		|| p->vy < 0 || master->window_height <= p->vy);
@@ -73,7 +73,7 @@ int	ff_segment_is_crossing(t_mappoint *p1, t_mappoint *p2, t_vector *q1, t_vecto
 	denom = (p2->vx - p1->vx) * (q2->y - q1->y) - (p2->vy - p1->vy) * (q2->x - q1->x);
 	if (denom == 0)
 		return (0);
-	s = (-(q2->y - q1->y) * (q1->x - p1->vx) + (q2->x - q1->x) * (q1->y - p1->vy)) / denom;
+	s = ((q2->y - q1->y) * (q1->x - p1->vx) - (q2->x - q1->x) * (q1->y - p1->vy)) / denom;
 	if (s < 0 || 1 < s)
 		return (0);
 	s = (+(p2->vy - p1->vy) * (q1->x - p1->vx) - (p2->vx - p1->vx) * (q1->y - p1->vy)) / denom;
@@ -82,27 +82,27 @@ int	ff_segment_is_crossing(t_mappoint *p1, t_mappoint *p2, t_vector *q1, t_vecto
 	return (1);
 }
 
-int	ff_segment_is_clipped(t_master *master, t_mappoint *p1, t_mappoint *p2)
+int	ff_segment_is_out(t_master *master, t_mappoint *p1, t_mappoint *p2)
 {
 	t_vector	q1;
 	t_vector	q2;
 
-	if (!ff_point_is_clipped(master, p1) || !ff_point_is_clipped(master, p2))
+	if (!ff_point_is_out(master, p1) || !ff_point_is_out(master, p2))
 		return (0);
 	q1 = (t_vector){ 0, 0, 0 };
 	q2 = (t_vector){ master->window_width, 0, 0 };
 	if (ff_segment_is_crossing(p1, p2, &q1, &q2))
-		return (1);
+		return (0);
 	q1 = (t_vector){ master->window_width, master->window_height, 0 };
 	if (ff_segment_is_crossing(p1, p2, &q2, &q1))
-		return (1);
+		return (0);
 	q2 = (t_vector){ 0, master->window_height, 0 };
 	if (ff_segment_is_crossing(p1, p2, &q1, &q2))
-		return (1);
+		return (0);
 	q1 = (t_vector){ 0, 0, 0 };
 	if (ff_segment_is_crossing(p1, p2, &q2, &q1))
-		return (1);
-	return (0);
+		return (0);
+	return (1);
 }
 
 static void ff_connect_points(t_master *master, int i, int j)
@@ -117,9 +117,8 @@ static void ff_connect_points(t_master *master, int i, int j)
 
 	p1 = master->points[i];
 	p2 = master->points[j];
-	if (ff_segment_is_clipped(master, p1, p2))
+	if (ff_segment_is_out(master, p1, p2))
 		return ;
-	// printf("(%d-%d) | (%.2f, %.2f, %.2f) -> (%.2f, %.2f, %.2f)\n", i, j, p1->vx, p1->vy, p1->vz, p2->vx, p2->vy, p2->vz);
 	if (fabs(p1->vx - p2->vx) >= fabs(p1->vy - p2->vy))
 	{
 		if (p1->vx > p2->vx)
@@ -135,8 +134,6 @@ static void ff_connect_points(t_master *master, int i, int j)
 			yi = (int)(m * (xi - p1->vx) + p1->vy + 0.5);
 			z = (p2->vz - p1->vz) / (p2->vx - p1->vx + 1e-10) * (xi - p1->vx) + p1->vz;
 			k = yi * master->image.size_line / sizeof(uint32_t) + xi;
-			// printf("(%d, %d)\n", xi, yi);
-			
 			if (!ff_pixel_is_clipped(master, xi, yi) && master->z_buffer[k] < z)
 			{
 				master->z_buffer[k] = z;
@@ -158,7 +155,6 @@ static void ff_connect_points(t_master *master, int i, int j)
 			xi = (int)(m * (yi - p1->vy) + p1->vx + 0.5);
 			z = (p2->vz - p1->vz) / (p2->vy - p1->vy + 1e-10) * (yi - p1->vy) + p1->vz;
 			k = yi * master->image.size_line / sizeof(uint32_t) + xi;
-			// printf("(%d, %d)\n", xi, yi);
 			if (!ff_pixel_is_clipped(master, xi, yi) && master->z_buffer[k] < z)
 			{
 				master->z_buffer[k] = z;
@@ -221,5 +217,4 @@ void	ff_new_image(t_master *master)
 	m->z_buffer = (double *)malloc(m->image_size * sizeof(double));
 	if (!(m->z_buffer))
 		error_exit(m, "failed to alloc z_buffer");
-	printf("bpp: %d, endian: %d, size_line: %d\n", m->image.bits_per_pixel, m->image.endian, m->image.size_line);
 }
