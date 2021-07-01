@@ -1,8 +1,29 @@
 #include "fdf.h"
 
+
+int	hook_change_transform(t_master *m, int key)
+{
+	if (key == KEY_1 || key == KEY_2 || key == KEY_3 || key == KEY_4)
+	{
+		if (key == KEY_1)
+			ff_set_tr_isometric(&(m->tr_project));
+		if (key == KEY_2)
+			ff_set_tr_cavalier(&(m->tr_project), 0.5);
+		if (key == KEY_3)
+			ff_set_tr_cavalier(&(m->tr_project), 1.0);
+		if (key == KEY_4)
+			ff_set_tr_military(&(m->tr_project));
+		m->tr_changed = 1;
+		return (1);
+	}
+	return (0);
+}
+
 int	hook_key_press(int key, t_master *m)
 {
 	printf("key = %d\n", key);
+	if (hook_change_transform(m, key))
+		return (0);
 	if (key == KEY_ESC || key == KEY_Q)
 		normal_exit(m);
 	if (key == KEY_0)

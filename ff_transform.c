@@ -31,7 +31,7 @@ void	ff_set_tr_cavalier(t_transform *t, double r)
 
 	d = r / sqrt(2);
 	*t = (t_transform){
-		1, d, 0, 0,
+		1, -d, 0, 0,
 		0, d, 1, 0,
 		d - 1, -1, d, 0,
 		0, 0, 0, 1 };
