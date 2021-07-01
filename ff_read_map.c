@@ -136,5 +136,6 @@ void	ff_read_map(t_master *master, const char *path)
 		dprintf(STDERR_FILENO, "points vs width not matched: (%u, %u)\n", master->points_used, master->map_width);
 	master->map_height = master->points_used / master->map_width;
 	ff_set_xy(master);
+	master->file_name = path;
 	dprintf(STDERR_FILENO, "(%u, %u)\n", master->map_width, master->map_height);
 }

@@ -78,8 +78,9 @@ typedef struct s_image
 
 typedef struct s_master
 {
-	void	*mlx;
-	void	*window;
+	void			*mlx;
+	void			*window;
+	const char		*file_name;
 
 	unsigned int	window_width;
 	unsigned int	window_height;

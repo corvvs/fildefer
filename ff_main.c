@@ -58,9 +58,6 @@ t_master	*init_master(void)
 		error_exit(master, "failed to new mlx");
 	master->window_width = WIN_WIDTH;
 	master->window_height = WIN_HEIGHT;
-	master->window = mlx_new_window(master->mlx, master->window_width, master->window_height, "fir de fer");
-	if (!(master->window))
-		error_exit(master, "failed to new window");
 	master->points_cap = 32;
 	master->points = (t_mappoint **)malloc(master->points_cap * sizeof(t_mappoint *));
 	if (!(master->points))
@@ -72,6 +69,16 @@ t_master	*init_master(void)
 	return (master);
 }
 
+
+void	init_window(t_master *master)
+{
+	master->window = mlx_new_window(master->mlx,
+		master->window_width, master->window_height,
+		(char *)master->file_name);
+	if (!(master->window))
+		error_exit(master, "failed to new window");
+}
+
 int main(int argc, char **argv)
 {
 	t_master	*master;
@@ -81,6 +88,7 @@ int main(int argc, char **argv)
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	master = init_master();
 	ff_read_map(master, argv[1]);
+	init_window(master);
 	ff_start_loop(master);
 	ff_print_map(master);
 	destroy_master(master);
