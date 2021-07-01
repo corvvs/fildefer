@@ -66,8 +66,9 @@ t_master	*init_master(void)
 	if (!(master->points))
 		error_exit(master, "failed to alloc points");
 	master->map_zscale = 1;
-	ff_set_tr_isometric(&master->transform);
 	ff_set_tr_isometric(&master->tr_project);
+	// ff_set_tr_military(&master->tr_project);
+	// ff_set_tr_cavalier(&master->tr_project, 1);
 	return (master);
 }
 

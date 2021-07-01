@@ -15,7 +15,9 @@ int	ff_main_loop(t_master *master)
 
 void	ff_start_loop(t_master *master)
 {
-	ff_new_image(master);
+	ff_new_image(master, 0);
+	ff_new_image(master, 1);
+	master->image = &(master->images[master->ii]);
 	ff_setup_tr_project(master);
 	master->tr_changed = 1;
 	mlx_loop_hook(master->mlx, &ff_main_loop, master);

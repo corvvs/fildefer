@@ -137,11 +137,11 @@ static void ff_connect_points(t_master *master, int i, int j)
 		{
 			yi = (int)(m * (xi - p1->vx) + p1->vy + 0.5);
 			z = (p2->vz - p1->vz) / (p2->vx - p1->vx + 1e-10) * (xi - p1->vx) + p1->vz;
-			k = yi * master->image.size_line / sizeof(uint32_t) + xi;
+			k = yi * master->image->size_line / sizeof(uint32_t) + xi;
 			if (!ff_pixel_is_out(master, xi, yi) && master->z_buffer[k] < z)
 			{
 				master->z_buffer[k] = z;
-				master->image.addr[k] = mix_color(p1, p2, (xi - p1->vx) / (p2->vx - p1->vx + 1e-10));
+				master->image->addr[k] = mix_color(p1, p2, (xi - p1->vx) / (p2->vx - p1->vx + 1e-10));
 			}
 			xi += 1;
 		}
@@ -158,11 +158,11 @@ static void ff_connect_points(t_master *master, int i, int j)
 		{
 			xi = (int)(m * (yi - p1->vy) + p1->vx + 0.5);
 			z = (p2->vz - p1->vz) / (p2->vy - p1->vy + 1e-10) * (yi - p1->vy) + p1->vz;
-			k = yi * master->image.size_line / sizeof(uint32_t) + xi;
+			k = yi * master->image->size_line / sizeof(uint32_t) + xi;
 			if (!ff_pixel_is_out(master, xi, yi) && master->z_buffer[k] < z)
 			{
 				master->z_buffer[k] = z;
-				master->image.addr[k] = mix_color(p1, p2, (yi - p1->vy) / (p2->vy - p1->vy + 1e-10));
+				master->image->addr[k] = mix_color(p1, p2, (yi - p1->vy) / (p2->vy - p1->vy + 1e-10));
 			}
 			yi += 1;
 		}
@@ -186,8 +186,8 @@ void	ff_draw_image(t_master *master)
 {
 	unsigned int	xy;
 
-	ft_bzero(master->image.addr,
-		(master->window_height * master->image.size_line));
+	ft_bzero(master->image->addr,
+		(master->window_height * master->image->size_line));
 	ff_fill_zbuffer(master);
 	xy = 0;
 	while (xy < master->map_height * master->map_width)
@@ -198,27 +198,32 @@ void	ff_draw_image(t_master *master)
 			ff_connect_points(master, xy, xy + 1);
 		xy += 1;
 	}
-	mlx_put_image_to_window(master->mlx, master->window, master->image.mlx_image, 0, 0);
+	mlx_put_image_to_window(master->mlx, master->window,
+		master->image->mlx_image, 0, 0);
+	master->ii = 1 - master->ii;
+	master->image = &(master->images[master->ii]);
 }
 
-void	ff_new_image(t_master *master) 
+void	ff_new_image(t_master *master, int i)
 {
 	t_master	*m;
+	t_image		*img;
 
 	m = master;
-	m->image.mlx_image = mlx_new_image(m->mlx,
+	img = &(m->images[i]);
+	img->mlx_image = mlx_new_image(m->mlx,
 		m->window_width, m->window_height);
-	if (!(m->image.mlx_image))
+	if (!(img->mlx_image))
 		error_exit(m, "failed to mlx_new_image");
-	m->image.addr = (int32_t *)mlx_get_data_addr(
-		m->image.mlx_image,
-		&(m->image.bits_per_pixel),
-		&(m->image.size_line),
-		&(m->image.endian)
+	img->addr = (int32_t *)mlx_get_data_addr(
+		img->mlx_image,
+		&(img->bits_per_pixel),
+		&(img->size_line),
+		&(img->endian)
 		);
-	if (!(m->image.addr))
+	if (!(img->addr))
 		error_exit(m, "failed to mlx_get_data_addr");
-	m->image_size = (m->window_height * m->image.size_line) / sizeof(uint32_t);
+	m->image_size = (m->window_height * img->size_line) / sizeof(uint32_t);
 	m->z_buffer = (double *)malloc(m->image_size * sizeof(double));
 	if (!(m->z_buffer))
 		error_exit(m, "failed to alloc z_buffer");
