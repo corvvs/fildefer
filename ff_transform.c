@@ -1,14 +1,39 @@
 #include "fdf.h"
 
-/*
- * set t as an isometric projection (for my standard)
- */
+// make transform t as an isometric projection (for my standard)
 void	ff_set_tr_isometric(t_transform *t)
 {
 	*t = (t_transform){
 		+1 / sqrt(2), -1 / sqrt(2), 0, 0,
 		+1 / sqrt(6), +1 / sqrt(6), +2 / sqrt(6), 0,
 		-1 / sqrt(3), -1 / sqrt(3), +1 / sqrt(3), 0,
+		0, 0, 0, 1 };
+}
+
+// make transform t as (one of) miliraty-projection.
+void	ff_set_tr_military(t_transform *t)
+{
+	double	r;
+
+	r = 1;
+	*t = (t_transform){
+		+1 / sqrt(2), -1 / sqrt(2), 0, 0,
+		+1 / sqrt(2), +1 / sqrt(2), r, 0,
+		-r / sqrt(2), -r / sqrt(2), 1, 0,
+		0, 0, 0, 1 };
+}
+
+// make transform t as cavalier-like projection.
+// (give r = 1 for cavalier, r = 0.5 for cabinet.)
+void	ff_set_tr_cavalier(t_transform *t, double r)
+{
+	double	d;
+
+	d = r / sqrt(2);
+	*t = (t_transform){
+		1, d, 0, 0,
+		0, d, 1, 0,
+		d - 1, -1, d, 0,
 		0, 0, 0, 1 };
 }
 
@@ -37,9 +62,21 @@ void	ff_set_tr_scale(t_transform *t, double mx, double my, double mz)
 }
 
 /*
+ * set t as a x-rotation transform
+ */
+void	ff_set_tr_x_rot(t_transform *t, double phi)
+{
+	*t = (t_transform){
+		1, 0, 0, 0,
+		0, +cos(phi), -sin(phi), 0,
+		0, +sin(phi), +cos(phi), 0,
+		0, 0, 0, 1 };
+}
+
+/*
  * set t as a z-rotation transform
  */
-void	ff_set_tr_rotate(t_transform *t, double phi)
+void	ff_set_tr_z_rot(t_transform *t, double phi)
 {
 	*t = (t_transform){
 		+cos(phi), -sin(phi), 0, 0,
@@ -126,8 +163,10 @@ void	ff_setup_tr_mapmod(t_master *m)
 {
 	t_transform	t;
 
-	ff_set_tr_rotate(&m->tr_mapmod, m->phi);
-	ff_set_tr_scale(&t, 1, 1, m->map_zscale);
+	ff_set_tr_scale(&m->tr_mapmod, 1, 1, m->map_zscale);
+	ff_set_tr_z_rot(&t, m->phi);
+	ff_tr_compose(&t, &m->tr_mapmod, &m->tr_mapmod);
+	ff_set_tr_x_rot(&t, m->theta);
 	ff_tr_compose(&t, &m->tr_mapmod, &m->tr_mapmod);
 }
 
@@ -157,7 +196,7 @@ void	ff_setup_tr_project(t_master *m)
 	ff_tr_compose(&t, &(m->tr_framing), &(m->tr_framing));
 	ff_set_tr_translate(&t, 0, 1 * m->window_height, 0);
 	ff_tr_compose(&t, &(m->tr_framing), &(m->tr_framing));
-	ff_set_tr_rotate(&m->tr_camera, 0);
+	ff_set_tr_z_rot(&m->tr_camera, 0);
 }
 
 void	ff_pan_tr_camera(t_master *master, double dx, double dy)

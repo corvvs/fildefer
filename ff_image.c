@@ -54,12 +54,14 @@ static int32_t	mix_color(t_mappoint *p1, t_mappoint *p2, double ratio)
 	return (mc);
 }
 
-int	ff_pixel_is_clipped(t_master *master, int x, int y)
+// returns 1, if a given pixel is out of the screen
+int	ff_pixel_is_out(t_master *master, int x, int y)
 {
 	return (x < 0 || (int)master->window_width <= x
 		|| y < 0 || (int)master->window_height <= y);
 }
 
+// returns 1, if a given point is out of the screen
 int	ff_point_is_out(t_master *master, t_mappoint *p)
 {
 	return (p->vx < 0 || master->window_width <= p->vx
@@ -77,12 +79,13 @@ int	ff_segment_is_crossing(t_mappoint *p1, t_mappoint *p2, t_vector *q1, t_vecto
 	s = ((q2->y - q1->y) * (q1->x - p1->vx) - (q2->x - q1->x) * (q1->y - p1->vy)) / denom;
 	if (s < 0 || 1 < s)
 		return (0);
-	s = (+(p2->vy - p1->vy) * (q1->x - p1->vx) - (p2->vx - p1->vx) * (q1->y - p1->vy)) / denom;
+	s = ((p2->vy - p1->vy) * (q1->x - p1->vx) - (p2->vx - p1->vx) * (q1->y - p1->vy)) / denom;
 	if (s < 0 || 1 < s)
 		return (0);
 	return (1);
 }
 
+// returns 1, if a segment formed by 2 given points is entirely out of the screen
 int	ff_segment_is_out(t_master *master, t_mappoint *p1, t_mappoint *p2)
 {
 	t_vector	q1;
@@ -135,7 +138,7 @@ static void ff_connect_points(t_master *master, int i, int j)
 			yi = (int)(m * (xi - p1->vx) + p1->vy + 0.5);
 			z = (p2->vz - p1->vz) / (p2->vx - p1->vx + 1e-10) * (xi - p1->vx) + p1->vz;
 			k = yi * master->image.size_line / sizeof(uint32_t) + xi;
-			if (!ff_pixel_is_clipped(master, xi, yi) && master->z_buffer[k] < z)
+			if (!ff_pixel_is_out(master, xi, yi) && master->z_buffer[k] < z)
 			{
 				master->z_buffer[k] = z;
 				master->image.addr[k] = mix_color(p1, p2, (xi - p1->vx) / (p2->vx - p1->vx + 1e-10));
@@ -156,7 +159,7 @@ static void ff_connect_points(t_master *master, int i, int j)
 			xi = (int)(m * (yi - p1->vy) + p1->vx + 0.5);
 			z = (p2->vz - p1->vz) / (p2->vy - p1->vy + 1e-10) * (yi - p1->vy) + p1->vz;
 			k = yi * master->image.size_line / sizeof(uint32_t) + xi;
-			if (!ff_pixel_is_clipped(master, xi, yi) && master->z_buffer[k] < z)
+			if (!ff_pixel_is_out(master, xi, yi) && master->z_buffer[k] < z)
 			{
 				master->z_buffer[k] = z;
 				master->image.addr[k] = mix_color(p1, p2, (yi - p1->vy) / (p2->vy - p1->vy + 1e-10));
@@ -166,6 +169,7 @@ static void ff_connect_points(t_master *master, int i, int j)
 	}
 }
 
+// initialize all z_buffer cells by (nearly) -inf
 void	ff_fill_zbuffer(t_master *master)
 {
 	size_t	i;

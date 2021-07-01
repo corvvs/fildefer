@@ -8,7 +8,8 @@ int	hook_key_press(int key, t_master *m)
 	if (key == KEY_0)
 	{
 		m->phi = 0;
-		ff_set_tr_rotate(&m->tr_camera, 0);
+		m->theta = 0;
+		ff_set_tr_z_rot(&m->tr_camera, 0);
 		ff_setup_tr_project(m);
 		m->tr_changed = 1;
 		return (0);
@@ -26,6 +27,16 @@ int	hook_key_press(int key, t_master *m)
 	if (key == KEY_UP || key == KEY_DOWN)
 	{
 		if (key == KEY_UP)
+			m->theta += M_PI / 32;
+		else
+			m->theta -= M_PI / 32;
+		ff_setup_tr_mapmod(m);
+		m->tr_changed = 1;
+		return (0);
+	}
+	if (key == KEY_Z || key == KEY_X)
+	{
+		if (key == KEY_Z)
 			m->map_zscale += 0.1;
 		else
 			m->map_zscale -= 0.1;

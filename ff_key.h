@@ -12,6 +12,8 @@
 # define KEY_A 0
 # define KEY_S 1
 # define KEY_D 2
+# define KEY_Z 6
+# define KEY_X 7
 
 # define MOUSE_BUTTON_1 1
 # define MOUSE_BUTTON_2 2

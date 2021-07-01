@@ -101,6 +101,7 @@ typedef struct s_master
 	t_transform		tr_camera;
 	t_transform		transform;
 	double			phi;
+	double			theta;
 	double			map_zscale;
 	t_image			image;
 	size_t			image_size;
@@ -128,7 +129,9 @@ void	ff_new_image(t_master *master);
 void    ff_draw_image(t_master *master);
 void	ff_apply_transform(t_master *master);
 void	ff_set_tr_isometric(t_transform *t);
-void	ff_set_tr_rotate(t_transform *t, double phi);
+void	ff_set_tr_parallel(t_transform *t);
+void	ff_set_tr_x_rot(t_transform *t, double phi);
+void	ff_set_tr_z_rot(t_transform *t, double phi);
 void	ff_form_transform(t_master *master);
 void	ff_tr_compose(t_transform *t, t_transform *s, t_transform *r);
 void	ff_transform_point(t_transform *transform, t_mappoint *point);
