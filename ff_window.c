@@ -19,6 +19,10 @@ void	ff_start_loop(t_master *master)
 {
 	ff_new_image(master, 0);
 	ff_new_image(master, 1);
+	master->z_buffer
+		= (double *)malloc(master->image_size * sizeof(double));
+	if (!(master->z_buffer))
+		error_exit(master, "failed to alloc z_buffer");
 	master->image = &(master->images[master->ii]);
 	ff_setup_tr_project(master);
 	master->tr_changed = 1;

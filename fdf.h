@@ -120,7 +120,6 @@ typedef struct s_master
 	int				do_y;
 }	t_master;
 
-void	destroy_master(t_master *master);
 void	error_exit(t_master *master, char *message);
 void	normal_exit(t_master *master);
 int		ff_atoi_d(char *str, int *d);

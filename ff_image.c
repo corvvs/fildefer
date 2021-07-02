@@ -82,7 +82,4 @@ void	ff_new_image(t_master *master, int i)
 	if (!(img->addr))
 		error_exit(m, "failed to mlx_get_data_addr");
 	m->image_size = (m->window_height * img->size_line) / sizeof(uint32_t);
-	m->z_buffer = (double *)malloc(m->image_size * sizeof(double));
-	if (!(m->z_buffer))
-		error_exit(m, "failed to alloc z_buffer");
 }

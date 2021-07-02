@@ -7,9 +7,6 @@ t_master	*init_master(void)
 	master = (t_master *)ft_calloc(1, sizeof(t_master));
 	if (!master)
 		error_exit(master, "failed to alloc master");
-	master->mlx = mlx_init();
-	if (!(master->mlx))
-		error_exit(master, "failed to new mlx");
 	master->window_width = WIN_WIDTH;
 	master->window_height = WIN_HEIGHT;
 	master->points_cap = 32;
@@ -24,6 +21,9 @@ t_master	*init_master(void)
 
 void	init_window(t_master *master)
 {
+	master->mlx = mlx_init();
+	if (!(master->mlx))
+		error_exit(master, "failed to new mlx");
 	master->window = mlx_new_window(master->mlx,
 			master->window_width, master->window_height,
 			(char *)master->file_name);
@@ -42,8 +42,6 @@ int	main(int argc, char **argv)
 	ff_read_map(master, argv[1]);
 	init_window(master);
 	ff_start_loop(master);
-	ff_print_map(master);
-	destroy_master(master);
-	// system("leaks fdf");
+	normal_exit(master);
 	return (0);
 }
