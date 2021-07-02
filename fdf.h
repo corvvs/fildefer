@@ -156,6 +156,5 @@ int		hook_key_press(int key, t_master *master);
 int		hook_mouse_down(int button, int x, int y, t_master *master);
 int		hook_mouse_up(int button, int x, int y, t_master *master);
 int		hook_motion(int x, int y, t_master *master);
-void	ff_print_map(t_master *master);
 
 #endif

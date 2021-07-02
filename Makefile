@@ -30,7 +30,6 @@ SRCS		:=	ff_main.c ff_exit.c ff_alloc.c ff_read_map.c ff_points.c\
 				ff_image.c ff_line.c ff_clipping.c ff_transform.c ff_projection.c ff_affine.c\
 				ff_window.c ff_camera.c ff_hook_key.c ff_hook_mouse.c\
 				ff_strs.c ff_atoi.c ff_split.c\
-				ff_debug.c\
 				$(GNL_SRCS)
 OBJS		:= $(SRCS:.c=.o)
 
