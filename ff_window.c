@@ -5,7 +5,9 @@ int	ff_main_loop(t_master *master)
 	if (master->painting || !master->tr_changed)
 		return (0);
 	master->painting = 1;
-	ff_form_transform(master);
+	ff_tr_compose(&master->tr_project, &master->tr_mapmod, &master->transform);
+	ff_tr_compose(&master->tr_framing, &master->transform, &master->transform);
+	ff_tr_compose(&master->tr_camera, &master->transform, &master->transform);
 	ff_apply_transform(master);
 	ff_draw_image(master);
 	master->painting = 0;
@@ -29,6 +31,5 @@ void	ff_start_loop(t_master *master)
 		MASK_MOUSE_RELEASE, &hook_mouse_up, master);
 	mlx_hook(master->window, EVENT_MOTION,
 		MASK_MOTION, &hook_motion, master);
-	
 	mlx_loop(master->mlx);
 }

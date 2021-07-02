@@ -1,48 +1,5 @@
 #include "fdf.h"
 
-void	destroy_master(t_master *master)
-{
-	if (!master)
-		return ;
-	if (master->mlx)
-	{
-		if (master->window)
-		{
-			mlx_destroy_window(master->mlx, master->window);
-			master->window = NULL;
-		}
-		master->mlx = NULL;
-	}
-	if (master->temp_blocks)
-	{
-		ff_free(master->temp_blocks);
-		free(master->temp_blocks);
-		master->temp_blocks = NULL;
-	}
-	if (master->points)
-	{
-		unsigned int i = -1;
-		while (++i < master->points_used)
-			free(master->points[i]);
-		free(master->points);
-	}
-	free(master);
-}
-
-void	error_exit(t_master *master, char *message)
-{
-	if (message)
-		ft_putendl_fd(message, STDERR_FILENO);
-	destroy_master(master);
-	exit(1);
-}
-
-void	normal_exit(t_master *master)
-{
-	destroy_master(master);
-	exit(0);
-}
-
 t_master	*init_master(void)
 {
 	t_master	*master;
@@ -50,36 +7,31 @@ t_master	*init_master(void)
 	master = (t_master *)ft_calloc(1, sizeof(t_master));
 	if (!master)
 		error_exit(master, "failed to alloc master");
-	master->temp_blocks = ff_new_block_list(NULL);
-	if (!(master->temp_blocks))
-		error_exit(master, "failed to alloc temp_blocks");
 	master->mlx = mlx_init();
 	if (!(master->mlx))
 		error_exit(master, "failed to new mlx");
 	master->window_width = WIN_WIDTH;
 	master->window_height = WIN_HEIGHT;
 	master->points_cap = 32;
-	master->points = (t_mappoint **)malloc(master->points_cap * sizeof(t_mappoint *));
+	master->points = (t_mappoint **)malloc(
+			master->points_cap * sizeof(t_mappoint *));
 	if (!(master->points))
 		error_exit(master, "failed to alloc points");
 	master->map_zscale = 1;
 	ff_set_tr_isometric(&master->tr_project);
-	// ff_set_tr_military(&master->tr_project);
-	// ff_set_tr_cavalier(&master->tr_project, 1);
 	return (master);
 }
-
 
 void	init_window(t_master *master)
 {
 	master->window = mlx_new_window(master->mlx,
-		master->window_width, master->window_height,
-		(char *)master->file_name);
+			master->window_width, master->window_height,
+			(char *)master->file_name);
 	if (!(master->window))
 		error_exit(master, "failed to new window");
 }
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
 	t_master	*master;
 

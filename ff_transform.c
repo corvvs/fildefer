@@ -1,98 +1,5 @@
 #include "fdf.h"
 
-// make transform t as an isometric projection (for my standard)
-void	ff_set_tr_isometric(t_transform *t)
-{
-	*t = (t_transform){
-		+1 / sqrt(2), -1 / sqrt(2), 0, 0,
-		+1 / sqrt(6), +1 / sqrt(6), +2 / sqrt(6), 0,
-		-1 / sqrt(3), -1 / sqrt(3), +1 / sqrt(3), 0,
-		0, 0, 0, 1 };
-}
-
-// make transform t as (one of) miliraty-projection.
-void	ff_set_tr_military(t_transform *t)
-{
-	double	r;
-
-	r = 1;
-	*t = (t_transform){
-		+1 / sqrt(2), -1 / sqrt(2), 0, 0,
-		+1 / sqrt(2), +1 / sqrt(2), r, 0,
-		-r / sqrt(2), -r / sqrt(2), 1, 0,
-		0, 0, 0, 1 };
-}
-
-// make transform t as cavalier-like projection.
-// (give r = 1 for cavalier, r = 0.5 for cabinet.)
-void	ff_set_tr_cavalier(t_transform *t, double r)
-{
-	double	d;
-
-	d = r / sqrt(2);
-	*t = (t_transform){
-		1, -d, 0, 0,
-		0, d, 1, 0,
-		d - 1, -1, d, 0,
-		0, 0, 0, 1 };
-}
-
-/*
- * set t as an translate transform
- */
-void	ff_set_tr_translate(t_transform *t, double x, double y, double z)
-{
-	*t = (t_transform){
-		1, 0, 0, x,
-		0, 1, 0, y,
-		0, 0, 1, z,
-		0, 0, 0, 1 };
-}
-
-/*
- * set t as an scaling transform
- */
-void	ff_set_tr_scale(t_transform *t, double mx, double my, double mz)
-{
-	*t = (t_transform){
-		mx, 0, 0, 0,
-		0, my, 0, 0,
-		0, 0, mz, 0,
-		0, 0, 0, 1 };
-}
-
-/*
- * set t as a x-rotation transform
- */
-void	ff_set_tr_x_rot(t_transform *t, double phi)
-{
-	*t = (t_transform){
-		1, 0, 0, 0,
-		0, +cos(phi), -sin(phi), 0,
-		0, +sin(phi), +cos(phi), 0,
-		0, 0, 0, 1 };
-}
-
-/*
- * set t as a z-rotation transform
- */
-void	ff_set_tr_z_rot(t_transform *t, double phi)
-{
-	*t = (t_transform){
-		+cos(phi), -sin(phi), 0, 0,
-		+sin(phi), +cos(phi), 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1 };
-}
-
-/*
- * copy s into t
- */
-void	ff_tr_copy(t_transform *t, t_transform *s)
-{
-	ft_memcpy(t, s, sizeof(t_transform));
-}
-
 /*
  * compose transforms t and s, and set the result to r.
  */
@@ -118,29 +25,17 @@ void	ff_tr_compose(t_transform *t, t_transform *s, t_transform *r)
 	};
 }
 
-void	ff_transform_point(t_transform *transform, t_mappoint *point)
-{
-	t_transform	*f;
-	t_mappoint	*p;
-
-	f = transform;
-	p = point;
-	p->vx = f->xx * p->x + f->xy * p->y + f->xz * p->z + f->xt;
-	p->vy = f->yx * p->x + f->yy * p->y + f->yz * p->z + f->yt;
-	p->vz = f->zx * p->x + f->zy * p->y + f->zz * p->z + f->zt;
-}
-
 // calculate bounding-box
 void	ff_derive_bbox(t_master *master)
 {
 	int			i;
 
-	master->vxmin = +1E300;
-	master->vymin = +1E300;
-	master->vzmin = +1E300;
-	master->vxmax = -1E300;
-	master->vymax = -1E300;
-	master->vzmax = -1E300;
+	master->vxmin = +INFINITY;
+	master->vymin = +INFINITY;
+	master->vzmin = +INFINITY;
+	master->vxmax = -INFINITY;
+	master->vymax = -INFINITY;
+	master->vzmax = -INFINITY;
 	i = -1;
 	while (++i < (int)master->points_used)
 	{
@@ -197,24 +92,4 @@ void	ff_setup_tr_project(t_master *m)
 	ff_set_tr_translate(&t, 0, 1 * m->window_height, 0);
 	ff_tr_compose(&t, &(m->tr_framing), &(m->tr_framing));
 	ff_set_tr_z_rot(&m->tr_camera, 0);
-}
-
-void	ff_pan_tr_camera(t_master *master, double dx, double dy)
-{
-	t_transform	t;
-
-	ff_set_tr_translate(&t, dx, dy, 0);
-	ff_tr_compose(&t, &master->tr_camera, &master->tr_camera);
-}
-
-void	ff_zoom_tr_camera(t_master *master, double cx, double cy, double m)
-{
-	t_transform	t;
-
-	ff_set_tr_translate(&t, -cx, -cy, 0);
-	ff_tr_compose(&t, &master->tr_camera, &master->tr_camera);
-	ff_set_tr_scale(&t, m, m, m);
-	ff_tr_compose(&t, &master->tr_camera, &master->tr_camera);
-	ff_set_tr_translate(&t, cx, cy, 0);
-	ff_tr_compose(&t, &master->tr_camera, &master->tr_camera);
 }

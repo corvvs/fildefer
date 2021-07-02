@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ff_destructive_split.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: yokawada <yokawada@student.42tokyo.jp>     +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/03/01 21:54:47 by yokawada          #+#    #+#             */
-/*   Updated: 2021/06/13 11:50:53 by yokawada         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "fdf.h"
 #define MODE_WORD	10
 #define MODE_DELIM	100
@@ -53,7 +41,7 @@ static int	ft_word_count(const char *str, char c)
 	return (word_count);
 }
 
-static void ff_strdup_r(char **dst, char *src, char c, int rest_words)
+static void	ff_strdup_r(char **dst, char *src, char c, int rest_words)
 {
 	int		n;
 

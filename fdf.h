@@ -93,7 +93,6 @@ typedef struct s_master
 	unsigned int	map_height;
 	unsigned int	points_used;
 	unsigned int	points_cap;
-	t_ff_block		*temp_blocks;
 	t_mappoint		**points;
 	double			vxmin;
 	double			vxmax;
@@ -121,11 +120,13 @@ typedef struct s_master
 	int				do_y;
 }	t_master;
 
+void	destroy_master(t_master *master);
 void	error_exit(t_master *master, char *message);
 void	normal_exit(t_master *master);
 int		ff_atoi_d(char *str, int *d);
 int		ff_atoi_hd(char *str, uint32_t *hd);
 char	**ff_destructive_split(char *str, char c);
+int		ff_line_to_points(t_master *master, char *line, int status);
 void	ff_read_map(t_master *master, const char *path);
 void	ff_start_loop(t_master *master);
 
@@ -139,11 +140,18 @@ void	ff_apply_transform(t_master *master);
 void	ff_set_tr_isometric(t_transform *t);
 void	ff_set_tr_military(t_transform *t);
 void	ff_set_tr_cavalier(t_transform *t, double r);
+void	ff_set_tr_translate(t_transform *t, double x, double y, double z);
+void	ff_set_tr_scale(t_transform *t, double mx, double my, double mz);
 void	ff_set_tr_x_rot(t_transform *t, double phi);
 void	ff_set_tr_z_rot(t_transform *t, double phi);
 void	ff_form_transform(t_master *master);
 void	ff_tr_compose(t_transform *t, t_transform *s, t_transform *r);
-void	ff_transform_point(t_transform *transform, t_mappoint *point);
+int		ff_pixel_is_out(t_master *master, int x, int y);
+int		ff_point_is_out(t_master *master, t_mappoint *p);
+int		ff_segment_is_crossing(t_mappoint *p1, t_mappoint *p2,
+			t_vector *q1, t_vector *q2);
+int		ff_segment_is_out(t_master *master, t_mappoint *p1, t_mappoint *p2);
+void	ff_connect_points(t_master *master, int i, int j);
 
 int		hook_key_press(int key, t_master *master);
 int		hook_mouse_down(int button, int x, int y, t_master *master);
