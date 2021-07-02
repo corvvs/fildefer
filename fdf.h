@@ -6,11 +6,16 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <limits.h>
+# include <stdint.h>
 # include "libft.h"
 # include "get_next_line.h"
 # include "mlx.h"
 # include "ff_alloc.h"
-# include "ff_key.h"
+# ifdef MLX_MAC
+#  include "ff_key.h"
+# else
+#  include "ff_key_linux.h"
+# endif
 #include <stdio.h>
 
 # define WIN_WIDTH 800
@@ -25,7 +30,7 @@
 # define MASK_MOUSE_RELEASE 8L
 # define MASK_MOTION 64L
 
-typedef struct	s_vector
+typedef struct s_vector
 {
 	double		x;
 	double		y;
@@ -129,7 +134,7 @@ void	ff_setup_tr_project(t_master *master);
 void	ff_pan_tr_camera(t_master *master, double dx, double dy);
 void	ff_zoom_tr_camera(t_master *master, double cx, double cy, double m);
 void	ff_new_image(t_master *master, int i);
-void    ff_draw_image(t_master *master);
+void	ff_draw_image(t_master *master);
 void	ff_apply_transform(t_master *master);
 void	ff_set_tr_isometric(t_transform *t);
 void	ff_set_tr_military(t_transform *t);
