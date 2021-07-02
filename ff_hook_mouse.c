@@ -1,6 +1,6 @@
 #include "fdf.h"
 
-#ifdef MLX_MAC
+#ifdef MLX_MMS
 static int	screen_y(t_master *m, int y)
 {
 	(void)m;

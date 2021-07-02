@@ -1,10 +1,10 @@
 # comment out this line for macOS!!
 FDF_MAC			:= 1
 # comment out this line for macOS with mlx_mms!!
-#MLX_MAC		:= 1
+#MLX_MMS		:= 1
 
 NAME		:= fdf
-ifdef MLX_MAC
+ifdef MLX_MMS
 	MLIBX_NAME		:= libmlx.dylib
 	MLIBX_DIR		:= ./minilibx_mms_20191025_beta
 	MLIBX			:= $(MLIBX_DIR)/$(MLIBX_NAME)
@@ -41,8 +41,8 @@ CFLAGS		:= -Wall -Wextra -Werror $(INCLUDES)
 ifdef FDF_MAC
 	CFLAGS	:= $(CFLAGS) -D FDF_MAC=1
 endif
-ifdef MLX_MAC
-	CFLAGS	:= $(CFLAGS) -D MLX_MAC=1
+ifdef MLX_MMS
+	CFLAGS	:= $(CFLAGS) -D MLX_MMS=1
 endif
 
 all			: $(NAME)

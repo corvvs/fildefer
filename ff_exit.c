@@ -12,7 +12,7 @@ static void	destroy_images(t_master *master)
 		free(master->z_buffer);
 }
 
-#ifdef FDF_MAC
+#ifdef MLX_MMS
 static void	destroy_master(t_master *master)
 {
 	unsigned int	i;
@@ -56,6 +56,7 @@ static void	destroy_master(t_master *master)
 			master->window = NULL;
 		}
 		mlx_destroy_display(master->mlx);
+		free(master->mlx);
 		master->mlx = NULL;
 	}
 	if (master->points)
@@ -74,13 +75,13 @@ void	error_exit(t_master *master, char *message)
 	if (message)
 		ft_putendl_fd(message, STDERR_FILENO);
 	destroy_master(master);
-	system("leaks fdf");
+	// system("leaks fdf");
 	exit(1);
 }
 
 void	normal_exit(t_master *master)
 {
 	destroy_master(master);
-	system("leaks fdf");
+	// system("leaks fdf");
 	exit(0);
 }

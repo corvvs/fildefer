@@ -11,7 +11,7 @@
 # include "get_next_line.h"
 # include "mlx.h"
 # include "ff_alloc.h"
-# ifdef MLX_MAC
+# ifdef MLX_MMS
 #  include "ff_key.h"
 # else
 #  include "ff_key_linux.h"
