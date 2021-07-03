@@ -33,7 +33,7 @@ void	ff_read_map(t_master *master, const char *path)
 		status = ff_line_to_points(master, line, status);
 		free(line);
 		if (status == -1)
-			error_exit(master, "failed to convert");
+			error_exit(master, "failed to parse map file");
 	}
 	if (master->map_width == 0)
 		error_exit(master, "no data found");

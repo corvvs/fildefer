@@ -35,6 +35,8 @@ int	ff_atoi_hd(char *str, uint32_t *hd)
 	n = 0;
 	if (str[0] == '0' && str[1] == 'x')
 		str += 2;
+	if (!(*str))
+		return (0);
 	while (*str)
 	{
 		i = ft_stri(DIGITS, ft_toupper(*(str++)));

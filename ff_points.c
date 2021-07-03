@@ -30,10 +30,11 @@ static size_t	array_len(char **strarray)
 	return (n);
 }
 
+// !!don't free `element`!!
 static t_mappoint	*make_point(char *element)
 {
 	char			**tokens;
-	size_t			token_size;
+	ssize_t			token_size;
 	int				z;
 	unsigned int	color;
 	t_mappoint		*point;
@@ -42,15 +43,14 @@ static t_mappoint	*make_point(char *element)
 	if (!tokens)
 		return (NULL);
 	token_size = array_len(tokens);
-	if (1 <= token_size && token_size <= 2)
-	{
-		if (ff_atoi_d(tokens[0], &z) == -1)
-			return (NULL);
-		color = 0xffffff;
-		if (2 <= token_size && ff_atoi_hd(tokens[1], &color) == -1)
-			return (NULL);
-	}
+	if (token_size < 1 || 2 < token_size || ff_atoi_d(tokens[0], &z) != 1)
+		token_size = -1;
+	color = 0xffffff;
+	if (token_size == 2 && ff_atoi_hd(tokens[1], &color) == 0)
+		token_size = -1;
 	free(tokens);
+	if (token_size == -1)
+		return (NULL);
 	point = (t_mappoint *)malloc(sizeof(t_mappoint));
 	if (!point)
 		return (NULL);
