@@ -25,7 +25,7 @@ LIBFT_NAME	:= libft.a
 LIBFT_A		:= $(LIBFT_DIR)/$(LIBFT_NAME)
 
 INCLUDES	:=	-I$(MLIBX_DIR) -I$(LIBFT_DIR)
-GNL_SRCS	:=	get_next_line.c get_next_line_utils.c
+GNL_SRCS	:=	get_next_line.c get_next_line_utils.c get_next_line_destroy.c
 SRCS		:=	ff_main.c ff_exit.c ff_alloc.c ff_read_map.c ff_points.c\
 				ff_image.c ff_line.c ff_clipping.c ff_transform.c ff_projection.c ff_affine.c\
 				ff_window.c ff_camera.c ff_hook_key.c ff_hook_mouse.c\

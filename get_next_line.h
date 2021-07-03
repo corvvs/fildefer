@@ -6,7 +6,7 @@
 /*   By: yokawada <yokawada@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/10 00:31:25 by yokawada          #+#    #+#             */
-/*   Updated: 2021/06/10 23:56:40 by yokawada         ###   ########.fr       */
+/*   Updated: 2021/07/03 09:26:18 by yokawada         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ typedef struct s_tank
 	struct s_tank	*next;
 }	t_tank;
 
-int		get_next_line(int fd, char **line);
+int		get_next_line(int fd, char **line, int do_exit);
 int		ft_retrieve_tank(t_tank **top, int fd, int create);
 char	*ft_shift_line(t_tank **top, int fd);
 char	*ft_strndup(char *mem, size_t n);
@@ -41,5 +41,6 @@ int		ft_read_and_store(t_tank **top, int fd, char **read_buffer);
 int		ft_store_data(t_tank **top, int fd, char *read_buffer, ssize_t rsize);
 int		ft_expand_tank(t_tank *top, size_t n);
 int		ft_clean(int rv, t_tank **top, int fd, char **read_buffer);
+void	get_next_line_destroy(t_tank *top);
 
 #endif

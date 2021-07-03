@@ -6,7 +6,7 @@
 /*   By: yokawada <yokawada@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/10 00:38:06 by yokawada          #+#    #+#             */
-/*   Updated: 2021/04/19 06:47:46 by yokawada         ###   ########.fr       */
+/*   Updated: 2021/07/03 09:26:49 by yokawada         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,12 +115,17 @@ int	ft_read_and_store(t_tank **top, int fd, char **read_buffer)
 	return (ft_store_data(top, fd, *read_buffer, rsize));
 }
 
-int	get_next_line(int fd, char **line)
+int	get_next_line(int fd, char **line, int do_exit)
 {
 	static t_tank	*top;
 	char			*read_buffer;
 	int				rv;
 
+	if (do_exit)
+	{
+		get_next_line_destroy(top);
+		return (0);
+	}
 	if (!line || BUFFER_SIZE == 0)
 		return (-1);
 	read_buffer = NULL;

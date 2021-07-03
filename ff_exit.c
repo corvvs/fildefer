@@ -67,6 +67,7 @@ static void	destroy_master(t_master *master)
 		free(master->points);
 	}
 	free(master);
+	get_next_line(0, NULL, 1);
 }
 #endif
 

@@ -27,7 +27,7 @@ void	ff_read_map(t_master *master, const char *path)
 	status = 1;
 	while (status == 1)
 	{
-		status = get_next_line(fd, &line);
+		status = get_next_line(fd, &line, 0);
 		if (status == -1)
 			error_exit(master, "failed to read map file");
 		status = ff_line_to_points(master, line, status);
