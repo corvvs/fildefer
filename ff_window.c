@@ -1,6 +1,6 @@
 #include "fdf.h"
 
-int	ff_main_loop(t_master *master)
+static int	main_loop(t_master *master)
 {
 	if (master->painting || !master->tr_changed)
 		return (0);
@@ -26,7 +26,7 @@ void	ff_start_loop(t_master *master)
 	master->image = &(master->images[master->ii]);
 	ff_setup_tr_project(master);
 	master->tr_changed = 1;
-	mlx_loop_hook(master->mlx, &ff_main_loop, master);
+	mlx_loop_hook(master->mlx, &main_loop, master);
 	mlx_hook(master->window, EVENT_KEY_PRESS,
 		MASK_KEY_PRESS, &hook_key_press, master);
 	mlx_hook(master->window, EVENT_MOUSE_PRESS,

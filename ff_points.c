@@ -38,7 +38,7 @@ static t_mappoint	*make_point(char *element)
 	unsigned int	color;
 	t_mappoint		*point;
 
-	tokens = ff_destructive_split(element, ',');
+	tokens = ff_split(element, ',');
 	if (!tokens)
 		return (NULL);
 	token_size = array_len(tokens);
@@ -81,13 +81,14 @@ static int	convert_points(t_master *master, ssize_t row_size, char **splitted)
 	return (err);
 }
 
+// convert a string(line) to map points
 int	ff_line_to_points(t_master *master, char *line, int status)
 {
 	int			err;
 	ssize_t		row_size;
 	char		**splitted;
 
-	splitted = ff_destructive_split(line, ' ');
+	splitted = ff_split(line, ' ');
 	if (!splitted)
 		return (-1);
 	row_size = array_len(splitted);

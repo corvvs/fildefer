@@ -1,6 +1,6 @@
 #include "fdf.h"
 
-t_master	*init_master(void)
+static t_master	*init_master(void)
 {
 	t_master	*master;
 
@@ -19,7 +19,7 @@ t_master	*init_master(void)
 	return (master);
 }
 
-void	init_window(t_master *master)
+static void	init_mlx(t_master *master)
 {
 	master->mlx = mlx_init();
 	if (!(master->mlx))
@@ -40,7 +40,7 @@ int	main(int argc, char **argv)
 	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	master = init_master();
 	ff_read_map(master, argv[1]);
-	init_window(master);
+	init_mlx(master);
 	ff_start_loop(master);
 	normal_exit(master);
 	return (0);

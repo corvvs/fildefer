@@ -1,6 +1,7 @@
 #include "fdf.h"
 
-void	ff_pan_tr_camera(t_master *master, double dx, double dy)
+// move camera with displacement (dx, dy) on C-system
+void	ff_pan_camera(t_master *master, double dx, double dy)
 {
 	t_transform	t;
 
@@ -8,7 +9,8 @@ void	ff_pan_tr_camera(t_master *master, double dx, double dy)
 	ff_tr_compose(&t, &master->tr_camera, &master->tr_camera);
 }
 
-void	ff_zoom_tr_camera(t_master *master, double cx, double cy, double m)
+// zoom by a magnitude m, centered at (cx, cy) on C-system
+void	ff_zoom_camera(t_master *master, double cx, double cy, double m)
 {
 	t_transform	t;
 

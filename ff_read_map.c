@@ -35,6 +35,8 @@ void	ff_read_map(t_master *master, const char *path)
 		if (status == -1)
 			error_exit(master, "failed to convert");
 	}
+	if (master->map_width == 0)
+		error_exit(master, "no data found");
 	if (master->points_used % master->map_width != 0)
 		error_exit(master, "points vs width not matched");
 	master->map_height = master->points_used / master->map_width;

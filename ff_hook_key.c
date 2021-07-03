@@ -1,6 +1,6 @@
 #include "fdf.h"
 
-int	hook_change_transform(t_master *m, int key)
+static int	hook_change_projection(t_master *m, int key)
 {
 	if (key == KEY_1 || key == KEY_2 || key == KEY_3 || key == KEY_4)
 	{
@@ -18,7 +18,7 @@ int	hook_change_transform(t_master *m, int key)
 	return (0);
 }
 
-int	hook_rotate(t_master *m, int key)
+static int	hook_rotate(t_master *m, int key)
 {
 	if (key == KEY_LEFT || key == KEY_RIGHT)
 	{
@@ -43,25 +43,26 @@ int	hook_rotate(t_master *m, int key)
 	return (0);
 }
 
-int	hook_pan(t_master *m, int key)
+static int	hook_pan(t_master *m, int key)
 {
 	if (key == KEY_W || key == KEY_A || key == KEY_S || key == KEY_D)
 	{
 		if (key == KEY_W)
-			ff_pan_tr_camera(m, 0, -4.0);
+			ff_pan_camera(m, 0, -4.0);
 		if (key == KEY_S)
-			ff_pan_tr_camera(m, 0, +4.0);
+			ff_pan_camera(m, 0, +4.0);
 		if (key == KEY_A)
-			ff_pan_tr_camera(m, -4.0, 0);
+			ff_pan_camera(m, -4.0, 0);
 		if (key == KEY_D)
-			ff_pan_tr_camera(m, +4.0, 0);
+			ff_pan_camera(m, +4.0, 0);
 		m->tr_changed = 1;
 		return (1);
 	}
 	return (0);
 }
 
-int	ff_reset_camera(t_master *m)
+// clear all user's operations for camera.
+static int	reset_camera(t_master *m)
 {
 	m->phi = 0;
 	m->theta = 0;
@@ -73,13 +74,12 @@ int	ff_reset_camera(t_master *m)
 
 int	hook_key_press(int key, t_master *m)
 {
-	printf("key = %d\n", key);
-	if (hook_change_transform(m, key))
+	if (hook_change_projection(m, key))
 		return (0);
 	if (key == KEY_ESC || key == KEY_Q)
 		normal_exit(m);
 	if (key == KEY_0)
-		return (ff_reset_camera(m));
+		return (reset_camera(m));
 	if (hook_rotate(m, key))
 		return (0);
 	if (key == KEY_Z || key == KEY_X)

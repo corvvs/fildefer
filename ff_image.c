@@ -1,6 +1,6 @@
 #include "fdf.h"
 
-static void	ff_transform_point(t_transform *transform, t_mappoint *point)
+static void	transform_point(t_transform *transform, t_mappoint *point)
 {
 	t_transform	*f;
 	t_mappoint	*p;
@@ -10,6 +10,19 @@ static void	ff_transform_point(t_transform *transform, t_mappoint *point)
 	p->vx = f->xx * p->x + f->xy * p->y + f->xz * p->z + f->xt;
 	p->vy = f->yx * p->x + f->yy * p->y + f->yz * p->z + f->yt;
 	p->vz = f->zx * p->x + f->zy * p->y + f->zz * p->z + f->zt;
+}
+
+// initialize all z_buffer cells by (nearly) -inf
+static void	fill_zbuffer(t_master *master)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < master->image_size)
+	{
+		master->z_buffer[i] = -1e300;
+		i += 1;
+	}
 }
 
 /*
@@ -22,31 +35,19 @@ void	ff_apply_transform(t_master *master)
 	i = 0;
 	while (i < master->points_used)
 	{
-		ff_transform_point(&(master->transform), master->points[i]);
+		transform_point(&(master->transform), master->points[i]);
 		i += 1;
 	}
 }
 
-// initialize all z_buffer cells by (nearly) -inf
-void	ff_fill_zbuffer(t_master *master)
-{
-	size_t	i;
-
-	i = 0;
-	while (i < master->image_size)
-	{
-		master->z_buffer[i] = -1e300;
-		i += 1;
-	}
-}
-
+// set colors into all image memories and set them for dispkaying.
 void	ff_draw_image(t_master *master)
 {
 	unsigned int	xy;
 
 	ft_bzero(master->image->addr,
 		(master->window_height * master->image->size_line));
-	ff_fill_zbuffer(master);
+	fill_zbuffer(master);
 	xy = 0;
 	while (xy < master->map_height * master->map_width)
 	{

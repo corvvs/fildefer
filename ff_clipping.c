@@ -1,19 +1,21 @@
 #include "fdf.h"
 
-// returns 1, if a given pixel is out of the screen
+// the function returns 1, if a given pixel is out of the screen
 int	ff_pixel_is_out(t_master *master, int x, int y)
 {
 	return (x < 0 || (int)master->window_width <= x
 		|| y < 0 || (int)master->window_height <= y);
 }
 
-// returns 1, if a given point is out of the screen
+// the function returns 1, if a given point is out of the screen
 int	ff_point_is_out(t_master *master, t_mappoint *p)
 {
 	return (p->vx < 0 || master->window_width <= p->vx
 		|| p->vy < 0 || master->window_height <= p->vy);
 }
 
+// the function returns 1, if a segment formed by p1 and p2
+// acrosses another segment formed by q1 and q2.
 int	ff_segment_is_crossing(t_mappoint *p1, t_mappoint *p2,
 	t_vector *q1, t_vector *q2)
 {
@@ -35,7 +37,7 @@ int	ff_segment_is_crossing(t_mappoint *p1, t_mappoint *p2,
 	return (1);
 }
 
-// returns 1, if a segment formed by 2 given points
+// the function returns 1, if a segment formed by 2 given points
 // is entirely out of the screen.
 int	ff_segment_is_out(t_master *master, t_mappoint *p1, t_mappoint *p2)
 {

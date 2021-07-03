@@ -124,15 +124,15 @@ void	error_exit(t_master *master, char *message);
 void	normal_exit(t_master *master);
 int		ff_atoi_d(char *str, int *d);
 int		ff_atoi_hd(char *str, uint32_t *hd);
-char	**ff_destructive_split(char *str, char c);
+char	**ff_split(char *str, char c);
 int		ff_line_to_points(t_master *master, char *line, int status);
 void	ff_read_map(t_master *master, const char *path);
 void	ff_start_loop(t_master *master);
 
 void	ff_setup_tr_mapmod(t_master *master);
 void	ff_setup_tr_project(t_master *master);
-void	ff_pan_tr_camera(t_master *master, double dx, double dy);
-void	ff_zoom_tr_camera(t_master *master, double cx, double cy, double m);
+void	ff_pan_camera(t_master *master, double dx, double dy);
+void	ff_zoom_camera(t_master *master, double cx, double cy, double m);
 void	ff_new_image(t_master *master, int i);
 void	ff_draw_image(t_master *master);
 void	ff_apply_transform(t_master *master);

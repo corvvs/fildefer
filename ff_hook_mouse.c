@@ -32,9 +32,9 @@ int	hook_mouse_down(int button, int x, int y, t_master *m)
 		y = screen_y(m, y);
 		v = (t_vector){x, m->window_height - y - 1, 0};
 		if (button == MOUSE_SCROLL_UP)
-			ff_zoom_tr_camera(m, v.x, v.y, 0.9);
+			ff_zoom_camera(m, v.x, v.y, 0.9);
 		else
-			ff_zoom_tr_camera(m, v.x, v.y, 1.1);
+			ff_zoom_camera(m, v.x, v.y, 1.1);
 		m->tr_changed = 1;
 		return (0);
 	}
@@ -43,7 +43,8 @@ int	hook_mouse_down(int button, int x, int y, t_master *m)
 
 int	hook_mouse_up(int button, int x, int y, t_master *m)
 {
-	printf("MU button = %d, (%d, %d)\n", button, x, y);
+	(void)x;
+	(void)y;
 	if (button == MOUSE_BUTTON_1)
 	{
 		m->dragging = 0;
@@ -56,7 +57,7 @@ int	hook_motion(int x, int y, t_master *m)
 {
 	if (m->dragging && !m->tr_changed)
 	{
-		ff_pan_tr_camera(m, x - m->do_x, y - m->do_y);
+		ff_pan_camera(m, x - m->do_x, y - m->do_y);
 		m->do_x = x;
 		m->do_y = y;
 		m->tr_changed = 1;

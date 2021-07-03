@@ -54,7 +54,7 @@ static void	ff_strdup_r(char **dst, char *src, char c, int rest_words)
 		ff_strdup_r(dst + 1, src + n + 1, c, rest_words - 1);
 }
 
-char	**ff_destructive_split(char *str, char c)
+char	**ff_split(char *str, char c)
 {
 	int		word_count;
 	char	**splitted;
