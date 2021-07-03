@@ -10,7 +10,6 @@
 # include "libft.h"
 # include "get_next_line.h"
 # include "mlx.h"
-# include "ff_alloc.h"
 # ifdef MLX_MMS
 #  include "ff_key.h"
 # else
