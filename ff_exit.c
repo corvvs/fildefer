@@ -76,13 +76,11 @@ void	error_exit(t_master *master, char *message)
 	if (message)
 		ft_putendl_fd(message, STDERR_FILENO);
 	destroy_master(master);
-	// system("leaks fdf");
 	exit(1);
 }
 
 void	normal_exit(t_master *master)
 {
 	destroy_master(master);
-	// system("leaks fdf");
 	exit(0);
 }

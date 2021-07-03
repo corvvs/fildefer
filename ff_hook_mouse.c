@@ -3,15 +3,15 @@
 #ifdef MLX_MMS
 static int	screen_y(t_master *m, int y)
 {
-	(void)m;
-	return (y);
+	return (m->window_height - 1 - y);
 }
 
 #else
 
 static int	screen_y(t_master *m, int y)
 {
-	return (m->window_height - y - 1);
+	(void)m;
+	return (y);
 }
 #endif
 
@@ -30,7 +30,7 @@ int	hook_mouse_down(int button, int x, int y, t_master *m)
 		&& (button == MOUSE_SCROLL_UP || button == MOUSE_SCROLL_DOWN))
 	{
 		y = screen_y(m, y);
-		v = (t_vector){x, m->window_height - y - 1, 0};
+		v = (t_vector){x, y, 0};
 		if (button == MOUSE_SCROLL_UP)
 			ff_zoom_camera(m, v.x, v.y, 0.9);
 		else

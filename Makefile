@@ -47,6 +47,9 @@ endif
 .PHONY		: all
 all			: $(NAME)
 
+.PHONY		: bonus
+bonus		: all
+
 .PHONY		: libft
 libft		: $(LIBFT_A)
 $(LIBFT_A)	:
