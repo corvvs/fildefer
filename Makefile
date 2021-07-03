@@ -97,3 +97,4 @@ name		: $(NAME)
 
 norm		:
 	python3 -m norminette *.{c,h} libft/
+	python3 -m norminette -v
