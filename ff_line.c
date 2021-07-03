@@ -22,7 +22,7 @@ static int32_t	mix_color(t_mappoint *p1, t_mappoint *p2, double ratio)
 	return (mc);
 }
 
-void	ff_connect_by_x(t_master *master, t_mappoint *p1, t_mappoint *p2,
+static void	ff_connect_by_x(t_master *master, t_mappoint *p1, t_mappoint *p2,
 	int capi)
 {
 	int			xi;
@@ -50,7 +50,7 @@ void	ff_connect_by_x(t_master *master, t_mappoint *p1, t_mappoint *p2,
 	}
 }
 
-void	ff_connect_by_y(t_master *master, t_mappoint *p1, t_mappoint *p2,
+static void	ff_connect_by_y(t_master *master, t_mappoint *p1, t_mappoint *p2,
 	int capi)
 {
 	int			xi;

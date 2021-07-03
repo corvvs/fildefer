@@ -1,5 +1,5 @@
-#ifndef FF_KEY_H
-# define FF_KEY_H
+#ifndef FF_KEY_MMS_H
+# define FF_KEY_MMS_H
 
 # define KEY_LEFT 123
 # define KEY_RIGHT 124

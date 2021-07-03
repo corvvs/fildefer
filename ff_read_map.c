@@ -1,6 +1,6 @@
 #include "fdf.h"
 
-void	ff_set_xy(t_master *m)
+static void	ff_set_xy(t_master *m)
 {
 	unsigned int	i;
 

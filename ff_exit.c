@@ -4,12 +4,21 @@ static void	destroy_images(t_master *master)
 {
 	if (!master)
 		return ;
-	if (master->images[0].mlx_image)
+	if (master->images[0].mlx_image && !master->images[0].destroyed)
+	{
+		master->images[0].destroyed = 1;
 		mlx_destroy_image(master->mlx, master->images[0].mlx_image);
-	if (master->images[1].mlx_image)
+	}
+	if (master->images[1].mlx_image && !master->images[1].destroyed)
+	{
+		master->images[1].destroyed = 1;
 		mlx_destroy_image(master->mlx, master->images[1].mlx_image);
+	}
 	if (master->z_buffer)
+	{
 		free(master->z_buffer);
+		master->z_buffer = NULL;
+	}
 }
 
 #ifdef MLX_MMS
@@ -22,8 +31,9 @@ static void	destroy_master(t_master *master)
 	if (master->mlx)
 	{
 		destroy_images(master);
-		if (master->window)
+		if (master->window && !master->destroying_window)
 		{
+			master->destroying_window = 1;
 			mlx_destroy_window(master->mlx, master->window);
 			master->window = NULL;
 		}

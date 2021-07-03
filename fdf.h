@@ -11,11 +11,10 @@
 # include "get_next_line.h"
 # include "mlx.h"
 # ifdef MLX_MMS
-#  include "ff_key.h"
+#  include "ff_key_mms.h"
 # else
 #  include "ff_key_linux.h"
 # endif
-#include <stdio.h>
 
 # define WIN_WIDTH 800
 # define WIN_HEIGHT 600
@@ -24,10 +23,12 @@
 # define EVENT_MOUSE_PRESS 4
 # define EVENT_MOUSE_RELEASE 5
 # define EVENT_MOTION 6
+# define EVENT_CLOSE 17
 # define MASK_KEY_PRESS 1L
 # define MASK_MOUSE_PRESS 4L
 # define MASK_MOUSE_RELEASE 8L
 # define MASK_MOTION 64L
+# define MASK_CLOSE 131072L
 
 typedef struct s_vector
 {
@@ -78,6 +79,7 @@ typedef struct s_image
 	int32_t			endian;
 	int32_t			bits_per_pixel;
 	int32_t			size_line;
+	int				destroyed;
 }	t_image;
 
 typedef struct s_master
@@ -85,6 +87,7 @@ typedef struct s_master
 	void			*mlx;
 	void			*window;
 	const char		*file_name;
+	int				destroying_window;
 
 	unsigned int	window_width;
 	unsigned int	window_height;

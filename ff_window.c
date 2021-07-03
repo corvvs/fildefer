@@ -15,6 +15,12 @@ static int	main_loop(t_master *master)
 	return (0);
 }
 
+static int	hook_window_close(t_master *master)
+{
+	normal_exit(master);
+	return (0);
+}
+
 void	ff_start_loop(t_master *master)
 {
 	ff_new_image(master, 0);
@@ -35,5 +41,7 @@ void	ff_start_loop(t_master *master)
 		MASK_MOUSE_RELEASE, &hook_mouse_up, master);
 	mlx_hook(master->window, EVENT_MOTION,
 		MASK_MOTION, &hook_motion, master);
+	mlx_hook(master->window, EVENT_CLOSE,
+		MASK_CLOSE, &hook_window_close, master);
 	mlx_loop(master->mlx);
 }

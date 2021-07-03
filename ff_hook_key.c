@@ -66,6 +66,7 @@ static int	reset_camera(t_master *m)
 {
 	m->phi = 0;
 	m->theta = 0;
+	m->map_zscale = 1;
 	ff_set_tr_z_rot(&m->tr_camera, 0);
 	ff_setup_tr_project(m);
 	m->tr_changed = 1;

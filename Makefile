@@ -1,5 +1,5 @@
 # comment out this line for macOS!!
-FDF_MAC			:= 1
+#FDF_MAC			:= 1
 # comment out this line for macOS with mlx_mms!!
 #MLX_MMS		:= 1
 
@@ -7,7 +7,6 @@ NAME		:= fdf
 ifdef MLX_MMS
 	MLIBX_NAME		:= libmlx.dylib
 	MLIBX_DIR		:= ./minilibx_mms_20191025_beta
-	MLIBX			:= $(MLIBX_DIR)/$(MLIBX_NAME)
 	LFLAGS			:= -framework OpenGL -framework AppKit -lz
 else
 	ifdef FDF_MAC
@@ -16,9 +15,9 @@ else
 		MLIBX_NAME	:= libmlx.a
 	endif
 	MLIBX_DIR		:= minilibx_linux
-	MLIBX			:= $(MLIBX_DIR)/$(MLIBX_NAME)
 	LFLAGS			:= -L$(MLIBX_DIR) -lXext -lX11 -lm
 endif
+MLIBX		:= $(MLIBX_DIR)/$(MLIBX_NAME)
 
 LIBFT_DIR	:= libft
 LIBFT_NAME	:= libft.a
@@ -62,19 +61,36 @@ $(MLIBX):
 	make -C $(MLIBX_DIR)
 	cp ./$(MLIBX) .
 
-.PHONY		: clean
-clean		:
+.PHONY		: clean_ff
+clean_ff	:
 	$(RM) $(OBJS)
-	$(RM) $(NAME) $(MLIBX_NAME)
+
+.PHONY		: fclean_ff
+fclean_ff	: clean_ff
+	$(RM) $(NAME)
+
+.PHONY		: clean_mlx
+clean_mlx	:
+	$(RM) $(MLIBX_NAME)
+
+.PHONY		: fclean_mlx
+fclean_mlx	: clean_mlx
+	$(MAKE) -C $(MLIBX_DIR) clean
+
+.PHONY		: clean
+clean		: clean_ff clean_mlx
 	$(MAKE) -C $(LIBFT_DIR) clean
 
 .PHONY		: fclean
-fclean		: clean
-	$(MAKE) -C $(MLIBX_DIR) clean
+fclean		: fclean_ff fclean_mlx
+	$(RM) $(NAME)
 	$(MAKE) -C $(LIBFT_DIR) fclean
 
 .PHONY		: re
 re			: fclean all
+
+.PHONY		: re_mlx
+re_mlx		: fclean_ff fclean_mlx all
 
 name		: $(NAME)
 	nm -u $(NAME)

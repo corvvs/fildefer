@@ -37,7 +37,6 @@ int	main(int argc, char **argv)
 
 	if (argc != 2)
 		error_exit(NULL, "usage: ./fdf [map file path]");
-	setvbuf(stdout, (char *)NULL, _IONBF, 0);
 	master = init_master();
 	ff_read_map(master, argv[1]);
 	init_mlx(master);
