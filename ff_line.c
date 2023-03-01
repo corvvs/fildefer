@@ -1,7 +1,8 @@
 #include "fdf.h"
+#include <stdio.h>
 
 // derive a color for the point between 2 given points.
-static int32_t	mix_color(t_mappoint *p1, t_mappoint *p2, double ratio)
+static int32_t	mix_color(t_mappoint *p1, t_mappoint *p2, double ratio, int ii, const char *s)
 {
 	int			n;
 	uint32_t	c1;
@@ -15,7 +16,19 @@ static int32_t	mix_color(t_mappoint *p1, t_mappoint *p2, double ratio)
 	{
 		c1 = (p1->color >> n) & 0xff;
 		c2 = (p2->color >> n) & 0xff;
+		if (ratio > 1.0)
+			ratio = 1.0;
+		if (ratio < 0.0)
+			ratio = 0.0;
 		tc = ((double)c2 - (double)c1) * ratio + (double)c1 + 0.5;
+		if (tc < 0) {
+			printf("[%s] tc: %f, c1: %u, c2: %u, ratio: %f, ii: %d\n", s, tc, c1, c2, ratio, ii);
+			if (s == "x") {
+				printf("[%s] p1x: %f, p2x %f, (ii - p1->vx) = %f / (p2->vx - p1->vx) = %f\n", s, p1->vx, p2->vx, (ii - p1->vx), (p2->vx - p1->vx));
+			} else {
+				printf("[%s] p1y: %f, p2y %f, (ii - p1->vy) = %f / (p2->vy - p1->vy) = %f\n", s, p1->vy, p2->vy, (ii - p1->vy), (p2->vy - p1->vy));
+			}
+		}
 		mc += ((int)tc << n);
 		n += 8;
 	}
@@ -44,7 +57,7 @@ static void	ff_connect_by_x(t_master *master, t_mappoint *p1, t_mappoint *p2,
 		{
 			master->z_buffer[k] = z;
 			master->image->addr[k]
-				= mix_color(p1, p2, (xi - p1->vx) / (p2->vx - p1->vx));
+				= mix_color(p1, p2, (xi - p1->vx) / (p2->vx - p1->vx), xi, "x");
 		}
 		xi += 1;
 	}
@@ -72,7 +85,7 @@ static void	ff_connect_by_y(t_master *master, t_mappoint *p1, t_mappoint *p2,
 		{
 			master->z_buffer[k] = z;
 			master->image->addr[k]
-				= mix_color(p1, p2, (yi - p1->vy) / (p2->vy - p1->vy));
+				= mix_color(p1, p2, (yi - p1->vy) / (p2->vy - p1->vy), yi, "y");
 		}
 		yi += 1;
 	}

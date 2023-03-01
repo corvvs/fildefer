@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_putnbr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yokawada <yokawada@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: corvvs <corvvs@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/07 15:29:11 by yokawada          #+#    #+#             */
-/*   Updated: 2021/04/09 18:58:08 by yokawada         ###   ########.fr       */
+/*   Updated: 2023/02/25 17:45:03 by corvvs           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,5 +18,5 @@ void	ft_putnbr_fd(int n, int fd)
 		ft_putnbr_fd(n / 10, fd);
 	else
 		write(fd, "-", n < 0);
-	write(fd, "9876543210123456789" + 9 + n % 10, 1);
+	write(fd, &"9876543210123456789"[9 + n % 10], 1);
 }
