@@ -35,7 +35,7 @@ OBJS		:=	$(SRCS:.c=.o)
 
 CC			:= gcc
 #CFLAGS		:= -fsanitize=address -Wall -Wextra -Werror $(INCLUDES)
-CFLAGS		:= -Wall -Wextra -Werror $(INCLUDES)
+CFLAGS		:= -O2 $(INCLUDES)
 ifdef FDF_MAC
 	CFLAGS	:= $(CFLAGS) -D FDF_MAC=1
 endif
